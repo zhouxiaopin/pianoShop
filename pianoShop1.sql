@@ -53,3 +53,4 @@ values ('10-13-13', '查看', '/sysRole /initQueryDetail', '10-13', '04', '01', 
 insert into TB_SYS_MENU (SYSMENUNO, SYSMENUNAME, SYSMENUURL, PARENTNO, LEVELCODE, USESTATUS, CREATETIME, SYSMENUICONCLS, SYSMENUEXECUTEJS, SYSMENUOPENSTYLE)
 values ('10-13-14', '设置权限', '/sysRole /initSetAuthority', '10-13', '04', '01', CURRENT_TIMESTAMP(), 'icon-edit', '01', '01');
 
+--id smallImg bigImg prodName,desc,price,status,createTime
