@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,height=device-height, minimum-scale=1.0, maximum-scale=1.0">
+    <title>拥堵路段</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/static/busAnalysisDisplay/css/style.css}" />
+    <script  th:src="@{/static/busAnalysisDisplay/js/jquery-1.11.1.min.js}"></script>
+    <script type="text/javascript">
+        (function(){
+            function sizeHtml(){
+                window.mtSizeBase = $(window).width()/32;
+                //window.mtSizeBase = window.mtSizeBase>45?45:window.mtSizeBase;
+                $("html").css("font-size",window.mtSizeBase+"px");
+            }
+            sizeHtml();
+            $(window).resize(function(){
+                setTimeout(function(){
+                    sizeHtml();
+                },300);
+            });
+        })();
+
+    </script>
+</head>
+<body class="common-bg" style="overflow:hidden;">
+    <h3 class="head-img"></h3> 
+    <div class="content-body">
+        <div class="nav-crosswise">
+            <div class="nav-crosswise-main c-fff"><span>当前位置</span>><span>数据分析</span>><span>公交运行</span>><span>拥堵路段</span></div>
+        </div>
+        <div class="main-area clearfix">
+            <div class="lengthways-nav fl" id="side-menu">
+                <div class="map-show-nav selected">
+                    <ul>
+                        <li>
+                            <span class="J_menuItem"><img th:src="@{/static/busAnalysisDisplay/images/quan.png}">地图展示</span>
+                            <ul>
+                                <li><a href="traffic-monitoring.html" th:href="@{/page/passengerFlowMonitor}">客流监控</a></li>
+                                <li><a href="car-monitoring.html" th:href="@{/page/busMonitor}">车辆监控</a></li>
+                                <li><a href="car-transfer.html" th:href="@{/page/busTransform}">车辆换乘</a></li>
+                                <li><a href="od-fenbu.html" th:href="@{/page/regionODDistri}">区域OD分布</a></li>
+                                <li><a href="alarm-msg.html" th:href="@{/page/alarmMsg}">报警信息</a></li>
+                            </ul>
+                        </li>
+                        <li  class="active">
+                            <span class="J_menuItem"><img th:src="@{/static/busAnalysisDisplay/images/quan.png}">数据分析</span>
+                            <ul>
+                                <li>
+                                    <span class="J_menuItem">公交客运</span>
+                                    <ul>
+                                        <li><a href="passenger-form.html" th:href="@{/page/passenVolumeCons}">客运量构成</a></li>
+                                        <li><a href="brush-card-number.html" th:href="@{/page/swingCardVolumeStati}">刷卡量统计</a></li>
+                                    </ul>
+                                </li>
+                                <li class="active">
+                                    <span class="J_menuItem">公交运行</span>
+                                    <ul>
+                                        <li><a href="gaofeng-chart.html" th:href="@{/page/peakRun}">高峰运行图</a></li>
+                                        <li><a href="running-speed-chart.html" th:href="@{/page/runSpeedStati}">运行速度统计</a></li>
+                                        <li><a href="traffic-zhishu.html" th:href="@{/page/trafficNum}">交通指数</a></li>
+                                        <li><a class="on">拥堵路段</a></li>
+                                    </ul>
+                                </li>
+                                <li>
+                                    <span class="J_menuItem">换乘分析</span>
+                                    <ul>
+                                        <li><a href="transfer-form.html" th:href="@{/page/transChangeCons}">换乘量构成</a></li>
+                                        <li><a href="transfer-tongji.html" th:href="@{/page/transChangeStati}">换乘量统计</a></li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+                
+            </div>
+            <div class="map-area fr " id="content">
+                <div class="data-area traffic-jam">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th class="num-one">拥堵等级</th>
+                                <th>拥堵路段</th>
+                                <th>车道数量</th>
+                                <th>路段长度(km)</th>
+                                <th>平均速度(km/h)</th>
+                                <th>同比增长(%)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td  class="num-one"><label class="state01">严重拥堵</label></td>
+                                <td>江南西路（从紫山大街到紫丹大街）</td>
+                                <td>2车道</td>
+                                <td class="orange">0.35</td>
+                                <td class="orange">13.67</td>
+                                <td><label class="growth">+2.64</label></td>
+                            </tr>
+                            <tr>
+                                <td class="num-one"><label class="state02">中度拥堵</label></td>
+                                <td>江南西路（从紫山大街到紫丹大街）</td>
+                                <td>2车道</td>
+                                <td class="orange">0.35</td>
+                                <td class="orange">13.67</td>
+                                <td><label class="growth">+2.64</label></td>
+                            </tr>
+                            <tr>
+                                <td class="num-one"><label class="state03">轻度拥堵</label></td>
+                                <td>江南西路（从紫山大街到紫丹大街）</td>
+                                <td>2车道</td>
+                                <td class="orange">0.35</td>
+                                <td class="orange">13.67</td>
+                                <td><label class="reduce">-2.64</label></td>
+                            </tr>
+                            <tr>
+                                <td  class="num-one"><label class="state01">严重拥堵</label></td>
+                                <td>江南西路（从紫山大街到紫丹大街）</td>
+                                <td>2车道</td>
+                                <td class="orange">0.35</td>
+                                <td class="orange">13.67</td>
+                                <td><label class="growth">+2.64</label></td>
+                            </tr>
+                            <tr>
+                                <td class="num-one"><label class="state02">中度拥堵</label></td>
+                                <td>江南西路（从紫山大街到紫丹大街）</td>
+                                <td>2车道</td>
+                                <td class="orange">0.35</td>
+                                <td class="orange">13.67</td>
+                                <td><label class="growth">+2.64</label></td>
+                            </tr>
+                            <tr>
+                                <td class="num-one"><label class="state03">轻度拥堵</label></td>
+                                <td>江南西路（从紫山大街到紫丹大街）</td>
+                                <td>2车道</td>
+                                <td class="orange">0.35</td>
+                                <td class="orange">13.67</td>
+                                <td><label class="reduce">-2.64</label></td>
+                            </tr>
+                            <tr>
+                                <td  class="num-one"><label class="state01">严重拥堵</label></td>
+                                <td>江南西路（从紫山大街到紫丹大街）</td>
+                                <td>2车道</td>
+                                <td class="orange">0.35</td>
+                                <td class="orange">13.67</td>
+                                <td><label class="growth">+2.64</label></td>
+                            </tr>
+                            <tr>
+                                <td class="num-one"><label class="state02">中度拥堵</label></td>
+                                <td>江南西路（从紫山大街到紫丹大街）</td>
+                                <td>2车道</td>
+                                <td class="orange">0.35</td>
+                                <td class="orange">13.67</td>
+                                <td><label class="growth">+2.64</label></td>
+                            </tr>
+                            <tr>
+                                <td class="num-one"><label class="state03">轻度拥堵</label></td>
+                                <td>江南西路（从紫山大街到紫丹大街）</td>
+                                <td>2车道</td>
+                                <td class="orange">0.35</td>
+                                <td class="orange">13.67</td>
+                                <td><label class="reduce">-2.64</label></td>
+                            </tr>
+                            <tr>
+                                <td  class="num-one"><label class="state01">严重拥堵</label></td>
+                                <td>江南西路（从紫山大街到紫丹大街）</td>
+                                <td>2车道</td>
+                                <td class="orange">0.35</td>
+                                <td class="orange">13.67</td>
+                                <td><label class="growth">+2.64</label></td>
+                            </tr>
+                            <tr>
+                                <td class="num-one"><label class="state02">中度拥堵</label></td>
+                                <td>江南西路（从紫山大街到紫丹大街）</td>
+                                <td>2车道</td>
+                                <td class="orange">0.35</td>
+                                <td class="orange">13.67</td>
+                                <td><label class="growth">+2.64</label></td>
+                            </tr>
+                            <tr>
+                                <td class="num-one"><label class="state03">轻度拥堵</label></td>
+                                <td>江南西路（从紫山大街到紫丹大街）</td>
+                                <td>2车道</td>
+                                <td class="orange">0.35</td>
+                                <td class="orange">13.67</td>
+                                <td><label class="reduce">-2.64</label></td>
+                            </tr>
+                            <tr>
+                                <td  class="num-one"><label class="state01">严重拥堵</label></td>
+                                <td>江南西路（从紫山大街到紫丹大街）</td>
+                                <td>2车道</td>
+                                <td class="orange">0.35</td>
+                                <td class="orange">13.67</td>
+                                <td><label class="growth">+2.64</label></td>
+                            </tr>
+                            <tr>
+                                <td class="num-one"><label class="state02">中度拥堵</label></td>
+                                <td>江南西路（从紫山大街到紫丹大街）</td>
+                                <td>2车道</td>
+                                <td class="orange">0.35</td>
+                                <td class="orange">13.67</td>
+                                <td><label class="growth">+2.64</label></td>
+                            </tr>
+                            <tr>
+                                <td class="num-one"><label class="state03">轻度拥堵</label></td>
+                                <td>江南西路（从紫山大街到紫丹大街）</td>
+                                <td>2车道</td>
+                                <td class="orange">0.35</td>
+                                <td class="orange">13.67</td>
+                                <td><label class="reduce">-2.64</label></td>
+                            </tr>
+                            <tr>
+                                <td  class="num-one"><label class="state01">严重拥堵</label></td>
+                                <td>江南西路（从紫山大街到紫丹大街）</td>
+                                <td>2车道</td>
+                                <td class="orange">0.35</td>
+                                <td class="orange">13.67</td>
+                                <td><label class="growth">+2.64</label></td>
+                            </tr>
+                            <tr>
+                                <td class="num-one"><label class="state02">中度拥堵</label></td>
+                                <td>江南西路（从紫山大街到紫丹大街）</td>
+                                <td>2车道</td>
+                                <td class="orange">0.35</td>
+                                <td class="orange">13.67</td>
+                                <td><label class="growth">+2.64</label></td>
+                            </tr>
+                            <tr>
+                                <td class="num-one"><label class="state03">轻度拥堵</label></td>
+                                <td>江南西路（从紫山大街到紫丹大街）</td>
+                                <td>2车道</td>
+                                <td class="orange">0.35</td>
+                                <td class="orange">13.67</td>
+                                <td><label class="reduce">-2.64</label></td>
+                            </tr>
+                            <tr>
+                                <td class="num-one"><label class="state03">轻度拥堵</label></td>
+                                <td>江南西路（从紫山大街到紫丹大街）</td>
+                                <td>2车道</td>
+                                <td class="orange">0.35</td>
+                                <td class="orange">13.67</td>
+                                <td><label class="reduce">-2.64</label></td>
+                            </tr>
+                            <tr>
+                                <td class="num-one"><label class="state03">轻度拥堵</label></td>
+                                <td>江南西路（从紫山大街到紫丹大街）</td>
+                                <td>2车道</td>
+                                <td class="orange">0.35</td>
+                                <td class="orange">13.67</td>
+                                <td><label class="reduce">-2.64</label></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</body>
+
+<script type="text/javascript">
+    $(function(){
+        var body = (document.compatMode && document.compatMode.toLowerCase() == "css1compat") ? document.documentElement : document.body;
+
+        function ResizeTable() {
+            var sideWidth = document.getElementById("side-menu");
+            var con = document.getElementById('content');
+
+            sideWidth.style.height = '' + Math.max((body.clientHeight - 100), 0) + "px";
+            con.style.height = '' + Math.max((body.clientHeight - 100), 0) + "px";
+            con.style.width = '' + Math.max((body.clientWidth - 180), 0) + "px";
+
+
+           
+        }
+        ResizeTable();
+
+        $(window).resize(function () {
+            ResizeTable()
+        });
+
+        var $item = $(".J_menuItem");
+        $item.on("click",function(){
+            var $this = $(this);
+            $this.siblings("ul").slideToggle(300);
+            $this.parent("li").siblings("li").find("ul").slideUp(300);
+            $this.parent("li").addClass("active").siblings("li").removeClass("active");
+        })
+
+
+
+
+    })
+</script>
+</html>

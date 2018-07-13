@@ -1,0 +1,102 @@
+<div xmlns:th="http://www.thymeleaf.org" th:fragment="left">
+    <div id="leftMenu" class="leftMenu easyui-accordion" data-options="border:false,fit:true" style="background-color: #F2F5F7;">
+
+    </div>
+    <script type="text/javascript" th:replace="common/fragment :: commonVar" xmlns:th="http://www.thymeleaf.org"></script>
+    <script type="text/javascript">
+        $(function () {
+
+            //报警信息窗体的点击事件调用的方法
+//            window.gotoAlarmRecordPage = function() {
+//                $('#leftMenu').accordion('select','报警管理');
+//                $('.leftMenu').find('ul li:contains(报警记录)').trigger('click');
+//            };
+            var path = basePath+'/sysMenu/getComboTree';
+            //系统菜单的父菜单编号（导航节点的为0)  菜单级别（00导航节点,01一级,02二级,03三级）
+            var param = {
+                'sysMenuCustom.parentNo':'0',
+                'sysMenuCustom.useStatus':'01',
+                'requestFlag': '1',
+                'orderBy': 'createTime asc'
+            };
+            ticc.ajaxRequest(path,param ,function (data) {
+//            data = data.reverse();
+                var $leftMenu = $('#leftMenu');
+                for(var i = 0, len = data.length; i < len; i++){
+                    if(i == 0){
+                        $leftMenu.accordion('add', {
+                            title: data[i].text,
+                            content: "<ul id='treeMenu"+i+"'></ul>",
+                            selected: true
+                        });
+                    }else{
+                        $leftMenu.accordion('add', {
+                            title: data[i].text,
+                            content: "<ul id='treeMenu"+i+"'></ul>",
+                            selected: false
+                        });
+                    }
+                    $('#treeMenu'+i).tree({
+                        animate: true,
+                        data: data[i].children,
+                        onSelect:function (node) {
+//                        alert(JSON.stringify(node));
+
+                            if($(this).tree('isLeaf',node.target)){
+
+                                var url = node.attributes.sysMenuUrl;
+                                if (!url){
+                                    $.messager.alert('提示','请先配置请求url','info');
+                                    return;
+                                }
+
+                                var $mainTabs = $('#mainTabs');
+                                var len = $mainTabs.tabs('tabs').length;
+                                /*判断tab数量*/
+                                if (len > 14){
+                                    $.messager.alert('提示','选项卡数量太多了','warning');
+                                    return;
+                                }
+                                var exists = $mainTabs.tabs('exists',node.text);
+                                /*判断tab是否已经存在*/
+                                if (exists){
+                                    /*tab存在，选中*/
+                                    $mainTabs.tabs('select',node.text);
+                                    return;
+                                }
+                                //打开方式--在当前窗口打开 "01",在新窗口打开"02"
+                                var sysMenuOpenStyle = node.attributes.sysMenuOpenStyle;
+                                url = url.replace('.action','');
+//                                ticc.alertInfo(basePath+url);
+                                switch (sysMenuOpenStyle){
+                                    case '02':
+                                        window.open(basePath+url);
+                                        break;
+                                    default:
+                                        $mainTabs.tabs('add',{
+                                            href:basePath+url,
+                                            method:'post',
+                                            title: node.text,
+                                            selected: true,
+                                            closable:true,
+                                            fit:true,
+                                            style:{padding:'0px'}
+                                        });
+                                        break;
+                                }
+//
+                            }
+
+                        }
+                    });
+                }
+
+            });
+
+        });
+
+
+
+    </script>
+
+</div>

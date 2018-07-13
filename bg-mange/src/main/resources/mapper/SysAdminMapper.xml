@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.zcp.bgmange.frame.dao.IAdminDao" >
+
+	<!-- 表与实体映射 -->
+	<resultMap id="AdminCustomMap" type="AdminCustom">
+		<id property="id" column="id" />
+		<result property="adminName" column="adminName" />
+		<result property="account" column="account" />
+		<result property="password" column="password" />
+		<result property="useStatus" column="useStatus" />
+		<result property="createTime" column="createTime" />
+	</resultMap>
+
+	<!-- 继承上面那个基本的映射,再扩展出级联查询 -->
+	<resultMap id="AdminAdminRoleMap" type="AdminCustom" extends="AdminCustomMap">
+		<collection property="adminRoles" resultMap="AdminRoleMap"></collection>
+	</resultMap>
+	<resultMap id="AdminRoleMap" type="AdminRole">
+		<result property="adminId" column="adminId" />
+		<result property="roleNo" column="roleNo" />
+	</resultMap>
+
+	<!-- 查询条件的sql片段 -->
+	<sql id="query_sys_admin">
+		<if test="null != adminCustom">
+			<!-- ${}拼接字符串，有sql注入的维修，少用 -->
+			<if test="null != adminCustom.adminName and '' != adminCustom.adminName">
+				AND adminName LIKE CONCAT('%',CONCAT(#{adminCustom.adminName},'%'))
+			</if>
+			<if test="null != adminCustom.account and '' != adminCustom.account">
+				AND ACCOUNT = #{adminCustom.account}
+			</if>
+			<if test="null != adminCustom.password and '' != adminCustom.password">
+				AND PASSWORD = #{adminCustom.password}
+			</if>
+			<if test="null != adminCustom.useStatus and '' != adminCustom.useStatus">
+				AND useStatus = #{adminCustom.useStatus}
+			</if>
+		</if>
+	</sql>
+	
+	<!-- 查询 -->
+	<!-- 
+		parameterType传入包装对象(包装了查询条件)
+  		resultType建议使用扩展对象
+  	 -->
+	<select id="queryObjs" parameterType="AdminQueryVo" resultMap="AdminAdminRoleMap">
+		SELECT a.*,r.* from tb_sys_admin a left join tb_admin_role r on a.id = r.adminid
+		<where>
+			<!-- 引用sql片段 的id,如果refid指定的id不在本mapper文件中,要前边加namespace -->
+			<include refid="query_sys_admin"></include>
+		</where>
+		ORDER BY createTime DESC
+		<if test="null != start and null != rows">
+			limit #{start},#{rows}
+		</if>
+	</select>
+
+	<select id="queryObj" parameterType="java.lang.String" resultMap="AdminAdminRoleMap">
+		SELECT a.*,r.* FROM tb_sys_admin a left join tb_admin_role r on a.id = r.adminid
+		<where>
+			AND a.id = #{pk}
+		</where>
+	</select>
+
+	<select id="queryCount" parameterType="AdminQueryVo" resultType="java.lang.Long">
+		SELECT count(1) FROM tb_sys_admin
+		<where>
+			<include refid="query_sys_admin"></include>
+		</where>
+	</select>
+
+
+	<!--添加-->
+	<insert id="insert" parameterType="AdminCustom" useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO tb_sys_admin
+			(
+				adminName,
+				account,
+				password,
+				useStatus,
+				createTime
+			)
+		VALUES
+			(
+				#{adminName},
+				#{account},
+				#{password},
+				#{useStatus},
+				#{createTime}
+			)
+	</insert>
+
+	<!-- 修改 -->
+	<update id="update" parameterType="AdminCustom">
+		UPDATE tb_sys_admin
+		<set>
+			<if test="adminName != null">adminName = #{adminName},</if>
+			<if test="account != null">account = #{account},</if>
+			<if test="password != null">password = #{password},</if>
+			<if test="useStatus != null">useStatus = #{useStatus},</if>
+		</set>
+		WHERE id = #{id}
+	</update>
+
+	<!-- 删除 -->
+	<delete id="delete" parameterType="AdminCustom">
+		DELETE FROM tb_sys_admin WHERE id = #{id}
+	</delete>
+
+	<!---->
+	<!-- 通过主键批量删除-->
+	<delete id="deleteList">
+		DELETE FROM tb_sys_admin WHERE id IN
+		<foreach collection="array" open="(" close=")" separator="," item="pk">
+			#{pk}
+		</foreach>
+	</delete>
+
+	<!--插入记录到中间表-->
+	<insert id="insertAdminRole" parameterType="java.util.List" useGeneratedKeys="false">
+		INSERT INTO tb_admin_role(adminId, roleNo) VALUES
+		<foreach collection="list" item="item" index="index" separator =",">
+				(#{item.adminId,jdbcType=VARCHAR}, #{item.roleNo,jdbcType=VARCHAR})
+		</foreach>
+	</insert>
+
+	<!--删除中间表记录-->
+	<delete id="deleteAdminRole" parameterType="java.lang.String">
+		DELETE FROM tb_admin_role WHERE adminId = #{adminId}
+	</delete>
+	<!--删除管理员角色表的记录-->
+	<delete id="deleteMulAdminSysRole">
+		DELETE FROM tb_admin_role WHERE adminId IN
+		<foreach collection="array" open="(" close=")" separator="," item="adminId">
+			#{adminId}
+		</foreach>
+	</delete>
+
+	<!--查询中间表记录-->
+	<select id="queryAdminRole" parameterType="java.lang.String" resultType="AdminRole">
+		SELECT * FROM tb_admin_role WHERE adminId = #{adminId}
+	</select>
+
+</mapper>

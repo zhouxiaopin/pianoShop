@@ -1,0 +1,60 @@
+/** {
+	padding: 0px;
+	margin: 0px;
+	color: #FFFFFF;
+}*/
+
+body, div, ul, li, ol, h1, h2, h3, h4, h5, h6, input, textarea, select, p, dl, dt, dd, a, img, button, form, table, th, tr, td, tbody, article,span
+aside, details, figcaption, figure, footer, header, hgroup, menu, nav, section {
+	box-sizing: border-box;
+	margin: 0;
+	padding: 0;
+	border: none;
+	/*color: #FFFFFF;*/
+	color: #31454A;
+	-webkit-backface-visibility: hidden;
+}
+
+body, html{width: 100%;height: 100%;overflow: hidden;margin:0;}
+.map{width: 100%;height: 100%;overflow: hidden;margin:0;}
+input,th,tr,td{
+	color: #3f545f;
+}
+ul, ol,li {
+	list-style: none;
+}
+input,img {
+	vertical-align: middle;
+}
+a{
+	text-decoration: none;
+}
+
+::-webkit-scrollbar{
+	width:12px;
+	border: 1px solid #dcdcdc;
+}
+/*上下按钮*/
+::-webkit-scrollbar-button    {
+	display: none;
+}
+/*滚动范围*/
+::-webkit-scrollbar-track{
+	background:#FFFFFF;
+	border: 1px solid #dcdcdc;
+}
+
+/*滚动块*/
+::-webkit-scrollbar-thumb{
+	background:#31454A;
+	border-radius:4px;
+}
+/*按钮样式*/
+.button{
+	min-width: 50px;
+	height: 26px;
+	border: none;
+	background-color: #31454A;
+	border-radius:5px;
+}
+

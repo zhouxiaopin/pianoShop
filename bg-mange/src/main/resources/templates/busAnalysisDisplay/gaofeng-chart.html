@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,height=device-height, minimum-scale=1.0, maximum-scale=1.0">
+    <title>高峰运行图</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/static/busAnalysisDisplay/css/style.css}" />
+    <script  th:src="@{/static/busAnalysisDisplay/js/jquery-1.11.1.min.js}"></script>
+    <script type="text/javascript">
+        (function(){
+            function sizeHtml(){
+                window.mtSizeBase = $(window).width()/32;
+                //window.mtSizeBase = window.mtSizeBase>45?45:window.mtSizeBase;
+                $("html").css("font-size",window.mtSizeBase+"px");
+            }
+            sizeHtml();
+            $(window).resize(function(){
+                setTimeout(function(){
+                    sizeHtml();
+                },300);
+            });
+        })();
+
+    </script>
+</head>
+<body class="common-bg" style="overflow:hidden;">
+    <h3 class="head-img"></h3> 
+    <div class="content-body">
+        <div class="nav-crosswise">
+            <div class="nav-crosswise-main c-fff"><span>当前位置</span>><span>数据分析</span>><span>公交运行</span>><span>高峰运行图</span></div>
+        </div>
+        <div class="main-area clearfix">
+            <div class="lengthways-nav fl" id="side-menu">
+                <div class="map-show-nav selected">
+                    <ul>
+                        <li>
+                            <span class="J_menuItem"><img th:src="@{/static/busAnalysisDisplay/images/quan.png}">地图展示</span>
+                            <ul>
+                                <li><a href="traffic-monitoring.html" th:href="@{/page/passengerFlowMonitor}">客流监控</a></li>
+                                <li><a href="car-monitoring.html" th:href="@{/page/busMonitor}">车辆监控</a></li>
+                                <li><a href="car-transfer.html" th:href="@{/page/busTransform}">车辆换乘</a></li>
+                                <li><a href="od-fenbu.html" th:href="@{/page/regionODDistri}">区域OD分布</a></li>
+                                <li><a href="alarm-msg.html" th:href="@{/page/alarmMsg}">报警信息</a></li>
+                            </ul>
+                        </li>
+                        <li  class="active">
+                            <span class="J_menuItem"><img th:src="@{/static/busAnalysisDisplay/images/quan.png}">数据分析</span>
+                            <ul>
+                                <li>
+                                    <span class="J_menuItem">公交客运</span>
+                                    <ul>
+                                        <li><a href="passenger-form.html" th:href="@{/page/passenVolumeCons}">客运量构成</a></li>
+                                        <li><a href="brush-card-number.html" th:href="@{/page/swingCardVolumeStati}">刷卡量统计</a></li>
+                                    </ul>
+                                </li>
+                                <li class="active">
+                                    <span class="J_menuItem">公交运行</span>
+                                    <ul>
+                                        <li><a class="on">高峰运行图</a></li>
+                                        <li><a href="running-speed-chart.html" th:href="@{/page/runSpeedStati}">运行速度统计</a></li>
+                                        <li><a href="traffic-zhishu.html" th:href="@{/page/trafficNum}">交通指数</a></li>
+                                        <li><a href="traffic-routes.html" th:href="@{/page/congestionRoad}">拥堵路段</a></li>
+                                    </ul>
+                                </li>
+                                <li>
+                                    <span class="J_menuItem">换乘分析</span>
+                                    <ul>
+                                        <li><a href="transfer-form.html" th:href="@{/page/transChangeCons}">换乘量构成</a></li>
+                                        <li><a href="transfer-tongji.html" th:href="@{/page/transChangeStati}">换乘量统计</a></li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+                
+            </div>
+            <div class="map-area fr " id="content">
+                <div class="data-area  bar">
+                    <div class="start-time up-start-time">
+                        <h3>78路车辆上行发班间隔图</h3>
+                        <!--<img src="images/start-time-chart.png" alt="" />-->
+                        <div style="position: relative;height: 90%"><div id="upHairClassChart" class="chartStyle"></div></div>
+                    </div>
+                    <div class="start-time down-start-time">
+                        <h3>78路车辆下行发班间隔图</h3>
+                        <!--<img th:src="@{/static/busAnalysisDisplay/images/start-time-chart.png}" alt="" />-->
+                        <!--<div style="position: relative;"><div id="downHairClassChart" class="chartStyle" style="width: 200px;height: 150px"></div></div>-->
+                        <div style="position: relative;height: 90%"><div id="downHairClassChart" class="chartStyle"></div></div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</body>
+
+<script type="text/javascript" th:replace="common/fragment :: commonVar"></script>
+<script type="text/javascript" th:src="@{/static/js/echarts/echarts.min.js}"></script>
+<script type="text/javascript" th:src="@{/static/js/prototypeExpand.js}"></script>
+<script type="text/javascript" th:src="@{/static/js/ticcCommon.js}"></script>
+<script th:inline="none" type="text/javascript">
+    //页面相关
+    $(function(){
+        var body = (document.compatMode && document.compatMode.toLowerCase() == "css1compat") ? document.documentElement : document.body;
+
+        function ResizeTable() {
+            var sideWidth = document.getElementById("side-menu");
+            var con = document.getElementById('content');
+
+            sideWidth.style.height = '' + Math.max((body.clientHeight - 100), 0) + "px";
+//            con.style.height = '' + Math.max((body.clientHeight - 100), 0) + "px";
+            con.style.height = '' + Math.max((body.clientHeight - 100), 0) + "px";
+            con.style.width = '' + Math.max((body.clientWidth - 180), 0) + "px";
+
+
+
+        }
+        ResizeTable();
+
+        $(window).resize(function () {
+            ResizeTable()
+        });
+
+        var $item = $(".J_menuItem");
+        $item.on("click",function(){
+            var $this = $(this);
+            $this.siblings("ul").slideToggle(300);
+            $this.parent("li").siblings("li").find("ul").slideUp(300);
+            $this.parent("li").addClass("active").siblings("li").removeClass("active");
+        })
+
+        $(".car-num-title li").click(function() {
+            var index = $(this).index();
+            $(this).addClass('cur').siblings('li').removeClass('cur');
+            $(this).parent().siblings('ul').children().hide();
+            $(this).parent().siblings('ul').children().eq(index).show();
+        });
+
+
+    });
+    //业务相关
+    $(function () {
+        // 基于准备好的dom，初始化echarts实例
+//        var upHairClassChart = echarts.init(document.getElementById('upHairClassChart'));
+
+        // 指定图表的配置项和数据
+        var hours = ['8:00', '8:15','8:30', '8:45', '9:00', '9:15', '9:30','9:45', '10:00'];
+        var days = ['岑村总站', '岑村红花岗', '岑村小学','岑村', '苗圃', '岑村桥','华农','11','22','33'];
+
+        var scale = 1;
+        //y x
+        var data = [[0,0,200],[0,1,200],[0,2,200],[0,3,46],[0,4,45],[0,5,45],[0,6,48],[0,7,48],[0,8,48],
+            [1,0,96],[1,1,100],[1,2,103],[1,3,103],[1,4,103],[1,5,103],[1,6,103],[1,7,103],[1,8,103],
+            [2,0,126],[2,1,125],[2,2,124],[2,3,125],[2,4,126],[2,5,128],[2,6,130],[2,7,130],[2,8,130],
+            [3,0,117],[3,1,114],[3,2,110],[3,3,106],[3,4,101],[3,5,96],[3,6,91],[3,7,91],[3,8,91],
+            [4,0,57],[4,1,62],[4,2,70],[4,3,77],[4,4,80],[4,5,83],[4,6,86],[4,7,86],[4,8,86],
+            [5,0,153],[5,1,153],[5,2,155],[5,3,160],[5,4,167],[5,5,173],[5,6,174],[5,7,174],[5,8,174],
+            [6,0,153],[6,1,153],[6,2,155],[6,3,160],[6,4,167],[6,5,173],[6,6,174],[6,7,174],[6,8,174],
+            [7,0,153],[7,1,153],[7,2,155],[7,3,160],[7,4,167],[7,5,173],[7,6,174],[7,7,174],[7,8,174],
+            [8,0,153],[8,1,153],[8,2,155],[8,3,160],[8,4,167],[8,5,173],[8,6,174],[8,7,174],[8,8,174],
+            [9,0,153],[9,1,153],[9,2,155],[9,3,160],[9,4,167],[9,5,173],[9,6,174],[9,7,174],[9,8,174]];
+
+        var len = days.length;
+        var h = 25+len*40;
+        $(".up-start-time>div").css('height', h);
+        $(".down-start-time>div").css('height', h);
+        // 基于准备好的dom，初始化echarts实例
+        var upHairClassChart = echarts.init(document.getElementById('upHairClassChart'));
+
+        data = data.map(function (item) {
+            return [item[1], item[0], item[2] || '-'];
+        });
+
+        //线的item样式
+        var lineItemStyle = {
+            normal: {
+                lineStyle:{
+                    width:3,
+                    color: '#0BB3FE'
+                }
+            }
+        };
+        var fontColor = '#ffffff';
+        var axisLabelStyle = {
+            padding: [0, 15, 0, 0],
+            textStyle: {
+                color: fontColor,
+                fontSize: 10*scale
+            }
+        };
+        var option = {
+            tooltip: {
+                position: 'top',
+                formatter: function (item) {
+                    if ('line'==item.seriesType){
+                        return new Date(item.value).format('hh:mm:ss');
+                    }
+                    // console.log(JSON.stringify(item));
+
+                }
+            },
+            animation: false,
+            grid: {
+//                height: '70%',
+//                width:'',
+//                weight: '80%',
+//                y: '10%',
+                left:'15%',
+                bottom:'15%',
+                top:'30%'
+            },
+            xAxis: [{
+                // type: 'category',
+                // type: 'value',
+                type: 'time',
+                // data: hours,
+                min:0,
+                max: 7200000,
+                splitNumber:10,
+                splitArea: {
+                    show: true
+                },
+                axisLabel:{
+                    textStyle: {
+                        color: fontColor,
+                        fontSize: 10*scale
+                    },
+                    formatter: function (value, index) {
+                        // 格式化成月/日，只在第一个刻度显示年份
+                        var date = new Date(value);
+                        var hour = date.getHours() < 10 ? "0" + date.getHours() : date.getHours();
+                        var minute = date.getMinutes() < 10 ? "0" + date.getMinutes() : date.getMinutes();
+                        // var second = date.getSeconds() < 10 ? "0" + date.getSeconds() : date.getSeconds();
+                        return hour+":"+minute;
+                    }
+                }
+            },
+                {
+                    type: 'category',
+                    // type: 'value',
+                    // type: 'time',
+                    data: hours,
+                    // min:0,
+                    // max: 24,
+                    splitArea: {
+                        show: true
+                    },
+                    axisLabel: axisLabelStyle
+                }
+            ],
+            yAxis: [
+                {
+                    type: 'category',
+                    data: days,
+                    splitArea: {
+                        show: true
+                    },
+                    axisLabel:{
+                        padding: [0, 15, 0,0],
+                        textStyle: {
+                            color: fontColor,
+                            fontSize: 10*scale
+                        }
+                    }
+                }
+            ],
+            visualMap: {
+                min: 0,
+                max: 200,
+                calculable: true,
+                orient: 'horizontal',
+                right: '5%',
+                top: '0%',
+                itemWidth:'10%',
+                itemHeight:'40%',
+                textStyle:{color:fontColor}
+            },
+//            dataZoom: [{
+//                show: true,
+//                width: 20,
+//                yAxisIndex: [
+//                    0
+//                ],
+////                bottom: 20,
+//                start: 0,
+//                end: 40,
+//                handleIcon: 'path://M306.1,413c0,2.2-1.8,4-4,4h-59.8c-2.2,0-4-1.8-4-4V200.8c0-2.2,1.8-4,4-4h59.8c2.2,0,4,1.8,4,4V413z',
+//                handleSize: '100%',
+//                handleStyle:{
+//                    // color:"#d3dee5"
+//                    color:"#0C489C"
+//                },
+//                textStyle:{color:fontColor},
+////                borderColor:"#0F1A32"
+//            }],
+            series: [
+                {
+                    name: 'Punch Card',
+                    type: 'heatmap',
+                    xAxisIndex: 1,
+                    data: data,
+                    label: {
+                        normal: {
+                            show: true
+                        }
+                    },
+                    itemStyle: {
+                        emphasis: {
+                            shadowBlur: 10,
+                            shadowColor: 'rgba(0, 0, 0, 0.5)'
+                        }
+                    }
+                },{
+                    name: '客流量',
+                    type: 'line',
+                    xAxisIndex: 0,
+                    // smooth: true, //这句就是让曲线变平滑的
+                    // data:[[1522306819000, 20161128], [1522306919000, 20161129],
+                    //     [1522307019000, 20161130], [1522307119000, 20161202],
+                    //     [1522307120000, 20161203],[1522307230000, 20161204],
+                    //     [1522302230000, 20161205], [1522307430000, 20161207],
+                    //     [1522407230000, 20161208]
+                    // ],
+                    data: [ {
+                        name: '岑村总站',
+                        value: 600000
+                    },{
+                        name: '岑村红花岗',
+                        value: 3000000
+                    },{
+                        name: '岑村小学',
+                        value: 4500000
+                    },{
+                        name: '岑村',
+                        value: 5400000
+                    },{
+                        name: '苗圃',
+                        value: 6600000
+                    },{
+                        name: '岑村桥',
+                        value: 6900000
+                    }],
+                    symbol: 'circle', //拐点样式
+                    // symbol: 'none', //拐点样式
+                    symbolSize: 8,
+                    itemStyle: lineItemStyle,
+                    /*                lineStyle:{
+                                        color:"#ffffff",
+                                        width:10,
+                                        type:'dotted'
+                                    }*/
+
+                }]
+        };
+
+
+        // 使用刚指定的配置项和数据显示图表。
+        upHairClassChart.setOption(option);
+
+
+        // 基于准备好的dom，初始化echarts实例
+        var downHairClassChart = echarts.init(document.getElementById('downHairClassChart'));
+        downHairClassChart.setOption(option);
+    });
+</script>
+</html>

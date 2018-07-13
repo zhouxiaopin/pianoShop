@@ -1,0 +1,178 @@
+.busCount{
+    width: 120px;
+    height: 100px;
+    padding: 5px;
+    color: #FFFFFF;
+    position: absolute;
+    right: 200px;
+    bottom: 50px;
+    z-index: 1201;
+    border:2px solid #5DCDE3;
+}
+.onlineBusCount{
+    width: 120px;
+    height: 100px;
+    padding: 5px;
+    color: #FFFFFF;
+    position: absolute;
+    right: 50px;
+    bottom: 50px;
+    z-index: 1201;
+    border:2px solid #E97D63;
+}
+.busTips{
+    width: 100%;
+    height: 40px;
+    text-align: center;
+    font-size: 20px;
+    vertical-align: middle;
+    line-height: 40px;
+}
+.busTips + b:nth-of-type(n+1){
+    height: 60px;
+    line-height: 60px;
+    font-size: 25px;
+    display: block;
+    text-align: center;
+}
+
+.busCountTips{
+    background-color: #5DCDE3;
+    color: #FFFFFF;
+}
+.onlineBusCountTips{
+    background-color: #E97D63;
+    color: #FFFFFF;
+}
+
+/*弹窗*/
+.dialog{
+    width: 900px;
+    height: 500px;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    -webkit-transform: translate(-50%,-50%);/* Safari 和 Chrome */
+    -ms-transform: translate(-50%,-50%);/* IE 9 */
+    -moz-transform: translate(-50%,-50%);/* Firefox */
+    -o-transform: translate(-50%,-50%);/* Opera */
+    transform: translate(-50%,-50%);
+    z-index: 1201;
+    background-color: #3F545F;
+    display: none;
+}
+.dialog>div{
+    width: 890px;
+    height: 443px;
+    border:1px solid #556D7A;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 5px;
+    position: absolute;
+    top: 50px;
+    left: 0;
+    bottom: 0;
+    right: 0;
+}
+.dialog>header{
+    height: 50px;
+    display: block;
+}
+.tabMenu input[type="radio"]{
+    display: none;
+}
+.tabMenu input[type="radio"] ~ label{
+    color: #5DCDE3;
+    cursor: pointer;
+    display: inline-block;
+    text-align: center;
+    vertical-align: middle;
+    margin: 0 5px;
+    line-height: 50px;
+    /*width: 286px;*/
+    width: 284px;
+}
+.tabMenu input:checked + label:nth-of-type(n+1){
+    color: #FFFFFF;
+    border-left: 1px #556D7A solid;
+    /*border-left-color: #556D7A;*/
+    /*border-left-style: solid;*/
+    border-right: 1px #556D7A solid;
+    /*border-right-color: #556D7A;*/
+    /*border-right-style: solid;*/
+    border-top: 2px #FFFFFF solid;
+    /*border-top-color: #FFFFFF;*/
+    /*border-top-style: solid;*/
+}
+/*  !*公交图片*!
+  .dialog>header img{
+    display:inline-block;
+    vertical-align:middle;
+  }
+  !*公交文字*!
+  .dialog>header b{
+    color: #FFFFFF;
+    font-size: 20px;
+    display:inline-block;
+    vertical-align:middle;
+  }*/
+/*公交显示左边区域*/
+.dialog div .left{
+    float: left;
+    width: 50%;
+    height: 100%;
+}
+/*公交显示右边区域*/
+.dialog div .right{
+    float: left;
+    width: 50%;
+    height: 100%;
+}
+.dialog div article.left ol{
+    display: block;
+    width: 100%;
+    height: 100%;
+    margin-top: 10px;
+}
+.dialog div article.left ol li{
+    float: left;
+    width: 50%;
+    height: 191px;
+    /*height: 50%;*/
+    list-style: none;
+    display: block;
+    text-align: center;
+}
+.dialog div article.left ol li *{
+    display: block;
+    margin: 0 auto;
+}
+.dialog div article.left ol li b:nth-of-type(1){
+    font-size: 18px;
+    margin-top: 10px;
+}
+.dialog div article.left ol li b:nth-of-type(2){
+    color: #7F9EA5;
+    font-size: 12px;
+    margin-top: 5px;
+}
+.dialog>section:nth-of-type(n){
+    display: none;
+}
+.dialog>section:nth-of-type(1){
+    display: block;
+}
+
+.dialog>section{
+    width: 890px;
+    height: 443px;
+    border:1px solid #556D7A;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 5px;
+    position: absolute;
+    top: 50px;
+    left: 0;
+    bottom: 0;
+    right: 0;
+}

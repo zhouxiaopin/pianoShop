@@ -1,0 +1,1054 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,height=device-height, minimum-scale=1.0, maximum-scale=1.0">
+    <title>区域OD分布</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/static/busAnalysisDisplay/css/style.css}" />
+    <script  th:src="@{/static/busAnalysisDisplay/js/jquery-1.11.1.min.js}"></script>
+    <script type="text/javascript">
+        (function(){
+            function sizeHtml(){
+                window.mtSizeBase = $(window).width()/32;
+                //window.mtSizeBase = window.mtSizeBase>45?45:window.mtSizeBase;
+                $("html").css("font-size",window.mtSizeBase+"px");
+            }
+            sizeHtml();
+            $(window).resize(function(){
+                setTimeout(function(){
+                    sizeHtml();
+                },300);
+            });
+        })();
+</script>
+</head>
+<body class="common-bg" style="overflow:hidden;">
+    <h3 class="head-img"></h3> 
+    <div class="content-body">
+        <div class="nav-crosswise">
+            <div class="nav-crosswise-main c-fff"><span>当前位置</span>><span>地图展示</span>><span>区域OD分布</span></div>
+        </div>
+        <div class="main-area clearfix">
+            <div class="lengthways-nav fl" id="side-menu">
+                <div class="map-show-nav selected">
+                    <ul>
+                        <li class="active">
+                            <span class="J_menuItem"><img th:src="@{/static/busAnalysisDisplay/images/quan.png}">地图展示</span>
+                            <ul>
+                                <li><a href="traffic-monitoring.html" th:href="@{/page/passengerFlowMonitor}">客流监控</a></li>
+                                <li><a href="car-monitoring.html" th:href="@{/page/busMonitor}">车辆监控</a></li>
+                                <li><a href="car-transfer.html" th:href="@{/page/busTransform}">车辆换乘</a></li>
+                                <li><a href="javascript:;" class="on">区域OD分布</a></li>
+                                <li><a href="alarm-msg.html" th:href="@{/page/alarmMsg}">报警信息</a></li>
+                            </ul>
+                        </li>
+                        <li >
+                            <span class="J_menuItem"><img th:src="@{/static/busAnalysisDisplay/images/quan.png}">数据分析</span>
+                            <ul>
+                                <li>
+                                    <span class="J_menuItem">公交客运</span>
+                                    <ul>
+                                        <li><a href="passenger-form.html" th:href="@{/page/passenVolumeCons}">客运量构成</a></li>
+                                        <li><a href="brush-card-number.html" th:href="@{/page/swingCardVolumeStati}">刷卡量统计</a></li>
+                                    </ul>
+                                </li>
+                                <li>
+                                    <span class="J_menuItem">公交运行</span>
+                                    <ul>
+                                        <li><a href="gaofeng-chart.html" th:href="@{/page/peakRun}">高峰运行图</a></li>
+                                        <li><a href="running-speed-chart.html" th:href="@{/page/runSpeedStati}">运行速度统计</a></li>
+                                        <li><a href="traffic-zhishu.html" th:href="@{/page/trafficNum}">交通指数</a></li>
+                                        <li><a href="traffic-routes.html" th:href="@{/page/congestionRoad}">拥堵路段</a></li>
+                                    </ul>
+                                </li>
+                                <li>
+                                    <span class="J_menuItem">换乘分析</span>
+                                    <ul>
+                                        <li><a href="transfer-form.html" th:href="@{/page/transChangeCons}">换乘量构成</a></li>
+                                        <li><a href="transfer-tongji.html" th:href="@{/page/transChangeStati}">换乘量统计</a></li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+                
+            </div>
+            <div class="map-area fr " id="content">
+                <!--<div class="keliu-form" style="display: none">-->
+                    <!--<div class="txt-center p-bottom">天河区客流交换量</div>-->
+                    <!--<div class="keliu-form-con">-->
+                    <!--</div>-->
+                    <!--<em></em>-->
+                    <!--<span class="down-arrow"></span>-->
+                <!--</div>-->
+                <!--<img src="images/map.jpg" alt="" />-->
+                <!--#######################################-->
+
+                <!--地图开始-->
+                <div id="regionODDistriMap" class="mapStyle">
+                </div>
+                <!--地图结束-->
+                <div class="rank-pup" id="pup">
+                    <h4 class="num">8941</h4>
+                    <p class="title">5月8日下车总数（次）</p>
+                    <div class="search">
+                        <input type="search" name="" placeholder="站点名/线路名称" />
+                    </div>
+                    <div class="rank-title">下车次数排名 TOP10</div>
+                    <ul class="top-ul">
+                        <li  class="active"><span>站点</span></li>
+                        <li><span>线路</span></li>
+                    </ul>
+                    <ul class="rank-data">
+                        <li>
+                            <ul class="progress-wrap">
+                                <li>
+                                    <span class="rank-num"><em>1</em></span>
+                                    <div class="progress">
+                                        <div class="info">
+                                            <span class="name" title="珠江新城站">珠江新城站</span>
+                                            <span class="name-right">751次 &nbsp; &nbsp;18.2%</span>
+                                        </div>
+                                        <div class="progress-bar">
+                                            <div class="progress-inner">
+                                                <!-- <div class="progress-inner"></div> -->
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li>
+                                    <span class="rank-num"><em>2</em></span>
+                                    <div class="progress">
+                                        <div class="info">
+                                            <span class="name" title="珠江新城站">珠江新城站</span>
+                                            <span class="name-right">751次 &nbsp; &nbsp;18.2%</span>
+                                        </div>
+                                        <div class="progress-bar">
+                                            <div class="progress-inner">
+                                                <!-- <div class="progress-inner"></div> -->
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li>
+                                    <span class="rank-num"><em>3</em></span>
+                                    <div class="progress">
+                                        <div class="info">
+                                            <span class="name" title="珠江新城站">珠江新城站</span>
+                                            <span class="name-right">751次 &nbsp; &nbsp;18.2%</span>
+                                        </div>
+                                        <div class="progress-bar">
+                                            <div class="progress-inner">
+                                                <!-- <div class="progress-inner"></div> -->
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li>
+                                    <span class="rank-num"><em>4</em></span>
+                                    <div class="progress">
+                                        <div class="info">
+                                            <span class="name" title="珠江新城站">珠江新城站</span>
+                                            <span class="name-right">751次 &nbsp; &nbsp;18.2%</span>
+                                        </div>
+                                        <div class="progress-bar">
+                                            <div class="progress-inner">
+                                                <!-- <div class="progress-inner"></div> -->
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li>
+                                    <span class="rank-num"><em>5</em></span>
+                                    <div class="progress">
+                                        <div class="info">
+                                            <span class="name" title="珠江新城站">珠江新城站</span>
+                                            <span class="name-right">751次 &nbsp; &nbsp;18.2%</span>
+                                        </div>
+                                        <div class="progress-bar">
+                                            <div class="progress-inner">
+                                                <!-- <div class="progress-inner"></div> -->
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li>
+                                    <span class="rank-num"><em>6</em></span>
+                                    <div class="progress">
+                                        <div class="info">
+                                            <span class="name" title="珠江新城站">珠江新城站</span>
+                                            <span class="name-right">751次 &nbsp; &nbsp;18.2%</span>
+                                        </div>
+                                        <div class="progress-bar">
+                                            <div class="progress-inner">
+                                                <!-- <div class="progress-inner"></div> -->
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li>
+                                    <span class="rank-num"><em>7</em></span>
+                                    <div class="progress">
+                                        <div class="info">
+                                            <span class="name" title="珠江新城站">珠江新城站</span>
+                                            <span class="name-right">751次 &nbsp; &nbsp;18.2%</span>
+                                        </div>
+                                        <div class="progress-bar">
+                                            <div class="progress-inner">
+                                                <!-- <div class="progress-inner"></div> -->
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li>
+                                    <span class="rank-num"><em>8</em></span>
+                                    <div class="progress">
+                                        <div class="info">
+                                            <span class="name" title="珠江新城站">珠江新城站</span>
+                                            <span class="name-right">751次 &nbsp; &nbsp;18.2%</span>
+                                        </div>
+                                        <div class="progress-bar">
+                                            <div class="progress-inner">
+                                                <!-- <div class="progress-inner"></div> -->
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li>
+                                    <span class="rank-num"><em>9</em></span>
+                                    <div class="progress">
+                                        <div class="info">
+                                            <span class="name" title="珠江新城站">珠江新城站</span>
+                                            <span class="name-right">751次 &nbsp; &nbsp;18.2%</span>
+                                        </div>
+                                        <div class="progress-bar">
+                                            <div class="progress-inner">
+                                                <!-- <div class="progress-inner"></div> -->
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li>
+                                    <span class="rank-num"><em>10</em></span>
+                                    <div class="progress">
+                                        <div class="info">
+                                            <span class="name" title="珠江新城站">珠江新城站</span>
+                                            <span class="name-right">751次 &nbsp; &nbsp;18.2%</span>
+                                        </div>
+                                        <div class="progress-bar">
+                                            <div class="progress-inner">
+                                                <!-- <div class="progress-inner"></div> -->
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                            </ul>
+                        </li>
+                        <li>
+                            <ul class="progress-wrap">
+                                <li>
+                                    <span class="rank-num"><em>1</em></span>
+                                    <div class="progress">
+                                        <div class="info">
+                                            <span class="name" title="珠江新城线">珠江新城线</span>
+                                            <span class="name-right">751次 &nbsp; &nbsp;18.2%</span>
+                                        </div>
+                                        <div class="progress-bar">
+                                            <div class="progress-inner">
+                                                <!-- <div class="progress-inner"></div> -->
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li>
+                                    <span class="rank-num"><em>2</em></span>
+                                    <div class="progress">
+                                        <div class="info">
+                                            <span class="name" title="珠江新城线">珠江新城线</span>
+                                            <span class="name-right">751次 &nbsp; &nbsp;18.2%</span>
+                                        </div>
+                                        <div class="progress-bar">
+                                            <div class="progress-inner">
+                                                <!-- <div class="progress-inner"></div> -->
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li>
+                                    <span class="rank-num"><em>3</em></span>
+                                    <div class="progress">
+                                        <div class="info">
+                                            <span class="name" title="珠江新城线">珠江新城线</span>
+                                            <span class="name-right">751次 &nbsp; &nbsp;18.2%</span>
+                                        </div>
+                                        <div class="progress-bar">
+                                            <div class="progress-inner">
+                                                <!-- <div class="progress-inner"></div> -->
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li>
+                                    <span class="rank-num"><em>4</em></span>
+                                    <div class="progress">
+                                        <div class="info">
+                                            <span class="name" title="珠江新城线">珠江新城线</span>
+                                            <span class="name-right">751次 &nbsp; &nbsp;18.2%</span>
+                                        </div>
+                                        <div class="progress-bar">
+                                            <div class="progress-inner">
+                                                <!-- <div class="progress-inner"></div> -->
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li>
+                                    <span class="rank-num"><em>5</em></span>
+                                    <div class="progress">
+                                        <div class="info">
+                                            <span class="name" title="珠江新城线">珠江新城线</span>
+                                            <span class="name-right">751次 &nbsp; &nbsp;18.2%</span>
+                                        </div>
+                                        <div class="progress-bar">
+                                            <div class="progress-inner">
+                                                <!-- <div class="progress-inner"></div> -->
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li>
+                                    <span class="rank-num"><em>6</em></span>
+                                    <div class="progress">
+                                        <div class="info">
+                                            <span class="name" title="珠江新城线">珠江新城线</span>
+                                            <span class="name-right">751次 &nbsp; &nbsp;18.2%</span>
+                                        </div>
+                                        <div class="progress-bar">
+                                            <div class="progress-inner">
+                                                <!-- <div class="progress-inner"></div> -->
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li>
+                                    <span class="rank-num"><em>7</em></span>
+                                    <div class="progress">
+                                        <div class="info">
+                                            <span class="name" title="珠江新城线">珠江新城线</span>
+                                            <span class="name-right">751次 &nbsp; &nbsp;18.2%</span>
+                                        </div>
+                                        <div class="progress-bar">
+                                            <div class="progress-inner">
+                                                <!-- <div class="progress-inner"></div> -->
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li>
+                                    <span class="rank-num"><em>8</em></span>
+                                    <div class="progress">
+                                        <div class="info">
+                                            <span class="name" title="珠江新城线">珠江新城线</span>
+                                            <span class="name-right">751次 &nbsp; &nbsp;18.2%</span>
+                                        </div>
+                                        <div class="progress-bar">
+                                            <div class="progress-inner">
+                                                <!-- <div class="progress-inner"></div> -->
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li>
+                                    <span class="rank-num"><em>9</em></span>
+                                    <div class="progress">
+                                        <div class="info">
+                                            <span class="name" title="珠江新城线">珠江新城线</span>
+                                            <span class="name-right">751次 &nbsp; &nbsp;18.2%</span>
+                                        </div>
+                                        <div class="progress-bar">
+                                            <div class="progress-inner">
+                                                <!-- <div class="progress-inner"></div> -->
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li>
+                                    <span class="rank-num"><em>10</em></span>
+                                    <div class="progress">
+                                        <div class="info">
+                                            <span class="name" title="珠江新城线">珠江新城线</span>
+                                            <span class="name-right">751次 &nbsp; &nbsp;18.2%</span>
+                                        </div>
+                                        <div class="progress-bar">
+                                            <div class="progress-inner">
+                                                <!-- <div class="progress-inner"></div> -->
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+<script type="text/javascript" th:replace="common/fragment :: commonVar"></script>
+<script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=fdv5gclnF2HSnNyKm4Dj3aVuLUGMLUZ1" ></script>
+<script type="text/javascript" src="http://api.map.baidu.com/library/InfoBox/1.2/src/InfoBox_min.js" ></script>
+<script th:src="@{/static/busAnalysisDisplay/js/baiduMapStyle.js}"></script>
+<script type="text/javascript" th:src="@{/static/js/echarts/echarts.min.js}"></script>
+<script type="text/javascript" th:src="@{/static/js/echarts/map/bmap.js}"></script>
+<script type="text/javascript" th:src="@{/static/js/echarts/map/guangzhou.js}"></script>
+
+<script th:src="@{/static/js/baiduMapCommon.js}"></script>
+<script th:src="@{/static/js/ticcCommon.js}"></script>
+<script th:inline="none" type="text/javascript">
+
+    //下面是页面的
+    $(function(){
+        var body = (document.compatMode && document.compatMode.toLowerCase() == "css1compat") ? document.documentElement : document.body;
+
+        function ResizeTable() {
+            var sideWidth = document.getElementById("side-menu");
+            var con = document.getElementById('content');
+            var pup = document.getElementById('pup');
+            var pupH = pup.clientHeight;
+
+            sideWidth.style.height = '' + Math.max((body.clientHeight - 100), 0) + "px";
+            con.style.height = '' + Math.max((body.clientHeight - 100), 0) + "px";
+            con.style.width = '' + Math.max((body.clientWidth - 180), 0) + "px";
+            pup.style.top = '' + Math.max((body.clientHeight - pupH)/2, 0) + "px";
+
+
+            var pro = Math.max((con.clientHeight - 100-300), 0) + "px";
+            $(".progress-wrap").css("height",pro)
+        }
+        ResizeTable();
+
+        $(window).resize(function () {
+            ResizeTable()
+        });
+
+        var $item = $(".J_menuItem");
+        $item.on("click",function(){
+            var $this = $(this);
+            $this.siblings("ul").slideToggle(300);
+            $this.parent("li").siblings("li").find("ul").slideUp(300);
+            $this.parent("li").addClass("active").siblings("li").removeClass("active");
+        })
+
+
+        $(".top-ul li").click(function() {
+            var index = $(this).index();
+            $(this).addClass('active').siblings('li').removeClass('active');
+            $(this).parent().siblings('ul').children().hide();
+            $(this).parent().siblings('ul').children().eq(index).show();
+        });
+
+        $(".map-show-ways li").click(function() {
+            $(this).addClass('current').siblings().removeClass('current');
+        });
+
+
+    });
+
+    $(function () {
+        // 获取Map实例
+//        var regionODDistriMap = baiduMapUtil.getDisplayMap("regionODDistriMap");
+//        regionODDistriMap.setMapStyle({styleJson:baiduMapStyle});
+//        //加上下面那句才不报错
+//        regionODDistriMap.centerAndZoom(new BMap.Point(113.3405,23.137428), 14);
+
+        /*#######################################*/
+
+
+        // 基于准备好的dom，初始化echarts实例
+        var myChart = echarts.init(document.getElementById('regionODDistriMap'));
+        // 指定图表的配置项和数据
+        var geoCoordMap = {
+            '海珠区': [113.32239,23.088981],
+            '荔湾区': [113.249636,23.133386],
+            '天河区': [113.367647,23.133548],
+            '白云区': [113.277708,23.163254],
+            '黄埔区': [113.465984,23.113123],
+            '花都区': [113.226002,23.412223],
+            '番禺区': [113.392197,22.945428],
+            '南沙区': [113.532585,22.810061],
+            '萝岗区': [113.506443,23.183805],
+            '从化区': [113.590713,23.554515],
+            '增城区': [113.814096,23.269249]
+        };
+
+        //海珠区
+        var HZData = [
+            [{name:'海珠区'}, {name:'荔湾区',value:95}],
+            [{name:'海珠区'}, {name:'天河区',value:90}],
+            [{name:'海珠区'}, {name:'白云区',value:80}],
+            [{name:'海珠区'}, {name:'黄埔区',value:70}],
+            [{name:'海珠区'}, {name:'花都区',value:60}],
+            [{name:'海珠区'}, {name:'番禺区',value:50}],
+            [{name:'海珠区'}, {name:'南沙区',value:40}],
+            [{name:'海珠区'}, {name:'萝岗区',value:30}],
+            [{name:'海珠区'}, {name:'从化区',value:20}],
+            [{name:'海珠区'}, {name:'增城区',value:10}],
+            [{name:'海珠区'}, {name:'海珠区',value:0}]
+        ];
+
+        //荔湾区
+        var LWData = [
+            [{name:'荔湾区'}, {name:'海珠区',value:95}],
+            [{name:'荔湾区'}, {name:'天河区',value:90}],
+            [{name:'荔湾区'}, {name:'白云区',value:80}],
+            [{name:'荔湾区'}, {name:'黄埔区',value:70}],
+            [{name:'荔湾区'}, {name:'花都区',value:60}],
+            [{name:'荔湾区'}, {name:'番禺区',value:50}],
+            [{name:'荔湾区'}, {name:'南沙区',value:40}],
+            [{name:'荔湾区'}, {name:'萝岗区',value:30}],
+            [{name:'荔湾区'}, {name:'从化区',value:20}],
+            [{name:'荔湾区'}, {name:'增城区',value:10}],
+            [{name:'荔湾区'}, {name:'荔湾区',value:0}]
+        ];
+        //天河区
+        var THData = [
+            [{name:'天河区'}, {name:'海珠区',value:95}],
+            [{name:'天河区'}, {name:'荔湾区',value:90}],
+            [{name:'天河区'}, {name:'白云区',value:80}],
+            [{name:'天河区'}, {name:'黄埔区',value:70}],
+            [{name:'天河区'}, {name:'花都区',value:60}],
+            [{name:'天河区'}, {name:'番禺区',value:50}],
+            [{name:'天河区'}, {name:'南沙区',value:40}],
+            [{name:'天河区'}, {name:'萝岗区',value:30}],
+            [{name:'天河区'}, {name:'从化区',value:20}],
+            [{name:'天河区'}, {name:'增城区',value:10}],
+            [{name:'天河区'}, {name:'天河区',value:0}]
+        ];
+        //白云区
+        var BYData = [
+            [{name:'白云区'}, {name:'海珠区',value:95}],
+            [{name:'白云区'}, {name:'荔湾区',value:90}],
+            [{name:'白云区'}, {name:'天河区',value:80}],
+            [{name:'白云区'}, {name:'黄埔区',value:70}],
+            [{name:'白云区'}, {name:'花都区',value:60}],
+            [{name:'白云区'}, {name:'番禺区',value:50}],
+            [{name:'白云区'}, {name:'南沙区',value:40}],
+            [{name:'白云区'}, {name:'萝岗区',value:30}],
+            [{name:'白云区'}, {name:'从化区',value:20}],
+            [{name:'白云区'}, {name:'增城区',value:10}],
+            [{name:'白云区'}, {name:'白云区',value:0}]
+        ];
+        //黄埔区
+        var HPData = [
+            [{name:'黄埔区'}, {name:'海珠区',value:95}],
+            [{name:'黄埔区'}, {name:'荔湾区',value:90}],
+            [{name:'黄埔区'}, {name:'天河区',value:80}],
+            [{name:'黄埔区'}, {name:'白云区',value:70}],
+            [{name:'黄埔区'}, {name:'花都区',value:60}],
+            [{name:'黄埔区'}, {name:'番禺区',value:50}],
+            [{name:'黄埔区'}, {name:'南沙区',value:40}],
+            [{name:'黄埔区'}, {name:'萝岗区',value:30}],
+            [{name:'黄埔区'}, {name:'从化区',value:20}],
+            [{name:'黄埔区'}, {name:'增城区',value:10}],
+            [{name:'黄埔区'}, {name:'黄埔区',value:0}]
+        ];
+        //花都区
+        var HDData = [
+            [{name:'花都区'}, {name:'海珠区',value:95}],
+            [{name:'花都区'}, {name:'荔湾区',value:90}],
+            [{name:'花都区'}, {name:'天河区',value:80}],
+            [{name:'花都区'}, {name:'白云区',value:70}],
+            [{name:'花都区'}, {name:'黄埔区',value:60}],
+            [{name:'花都区'}, {name:'番禺区',value:50}],
+            [{name:'花都区'}, {name:'南沙区',value:40}],
+            [{name:'花都区'}, {name:'萝岗区',value:30}],
+            [{name:'花都区'}, {name:'从化区',value:20}],
+            [{name:'花都区'}, {name:'增城区',value:10}],
+            [{name:'花都区'}, {name:'花都区',value:10}]
+        ];
+        //番禺区
+        var PYData = [
+            [{name:'番禺区'}, {name:'海珠区',value:95}],
+            [{name:'番禺区'}, {name:'荔湾区',value:90}],
+            [{name:'番禺区'}, {name:'天河区',value:80}],
+            [{name:'番禺区'}, {name:'白云区',value:70}],
+            [{name:'番禺区'}, {name:'黄埔区',value:60}],
+            [{name:'番禺区'}, {name:'花都区',value:50}],
+            [{name:'番禺区'}, {name:'南沙区',value:40}],
+            [{name:'番禺区'}, {name:'萝岗区',value:30}],
+            [{name:'番禺区'}, {name:'从化区',value:20}],
+            [{name:'番禺区'}, {name:'增城区',value:10}],
+            [{name:'番禺区'}, {name:'番禺区',value:0}]
+        ];
+        //南沙区
+        var NSData = [
+            [{name:'南沙区'}, {name:'海珠区',value:95}],
+            [{name:'南沙区'}, {name:'荔湾区',value:90}],
+            [{name:'南沙区'}, {name:'天河区',value:80}],
+            [{name:'南沙区'}, {name:'白云区',value:70}],
+            [{name:'南沙区'}, {name:'黄埔区',value:60}],
+            [{name:'南沙区'}, {name:'花都区',value:50}],
+            [{name:'南沙区'}, {name:'番禺区',value:40}],
+            [{name:'南沙区'}, {name:'萝岗区',value:30}],
+            [{name:'南沙区'}, {name:'从化区',value:20}],
+            [{name:'南沙区'}, {name:'增城区',value:10}],
+            [{name:'南沙区'}, {name:'南沙区',value:10}]
+        ];
+        //萝岗区
+        var LGData = [
+            [{name:'萝岗区'}, {name:'海珠区',value:95}],
+            [{name:'萝岗区'}, {name:'荔湾区',value:90}],
+            [{name:'萝岗区'}, {name:'天河区',value:80}],
+            [{name:'萝岗区'}, {name:'白云区',value:70}],
+            [{name:'萝岗区'}, {name:'黄埔区',value:60}],
+            [{name:'萝岗区'}, {name:'花都区',value:50}],
+            [{name:'萝岗区'}, {name:'番禺区',value:40}],
+            [{name:'萝岗区'}, {name:'南沙区',value:30}],
+            [{name:'萝岗区'}, {name:'从化区',value:20}],
+            [{name:'萝岗区'}, {name:'增城区',value:10}],
+            [{name:'萝岗区'}, {name:'萝岗区',value:0}]
+        ];
+        //从化区
+        var CHData = [
+            [{name:'从化区'}, {name:'海珠区',value:95}],
+            [{name:'从化区'}, {name:'荔湾区',value:90}],
+            [{name:'从化区'}, {name:'天河区',value:80}],
+            [{name:'从化区'}, {name:'白云区',value:70}],
+            [{name:'从化区'}, {name:'黄埔区',value:60}],
+            [{name:'从化区'}, {name:'花都区',value:50}],
+            [{name:'从化区'}, {name:'番禺区',value:40}],
+            [{name:'从化区'}, {name:'南沙区',value:30}],
+            [{name:'从化区'}, {name:'萝岗区',value:20}],
+            [{name:'从化区'}, {name:'增城区',value:10}],
+            [{name:'从化区'}, {name:'从化区',value:10}]
+        ];
+        //增城区
+        var ZCData = [
+            [{name:'增城区'}, {name:'海珠区',value:95}],
+            [{name:'增城区'}, {name:'荔湾区',value:90}],
+            [{name:'增城区'}, {name:'天河区',value:80}],
+            [{name:'增城区'}, {name:'白云区',value:70}],
+            [{name:'增城区'}, {name:'黄埔区',value:60}],
+            [{name:'增城区'}, {name:'花都区',value:50}],
+            [{name:'增城区'}, {name:'番禺区',value:40}],
+            [{name:'增城区'}, {name:'南沙区',value:30}],
+            [{name:'增城区'}, {name:'萝岗区',value:20}],
+            [{name:'增城区'}, {name:'从化区',value:10}],
+            [{name:'增城区'}, {name:'增城区',value:10}]
+        ];
+
+        var planePath = 'path://M1705.06,1318.313v-89.254l-319.9-221.799l0.073-208.063c0.521-84.662-26.629-121.796-63.961-121.491c-37.332-0.305-64.482,36.829-63.961,121.491l0.073,208.063l-319.9,221.799v89.254l330.343-157.288l12.238,241.308l-134.449,92.931l0.531,42.034l175.125-42.917l175.125,42.917l0.531-42.034l-134.449-92.931l12.238-241.308L1705.06,1318.313z';
+
+        var convertData = function (data) {
+            var res = [];
+            for (var i = 0; i < data.length; i++) {
+                var dataItem = data[i];
+                var fromCoord = geoCoordMap[dataItem[0].name];
+                var toCoord = geoCoordMap[dataItem[1].name];
+                if (fromCoord && toCoord) {
+                    res.push([{
+                        coord: fromCoord
+                    }, {
+                        coord: toCoord
+                    }]);
+                }
+            }
+            return res;
+        };
+
+        var color = ['#a6c84c', '#ffa022', '#46bee9','#a6c84c', '#ffa022', '#46bee9','#a6c84c', '#ffa022', '#46bee9','#a6c84c', '#ffa022', '#46bee9', '#46bee9'];
+        var series = [];
+        [['海珠区',HZData],['荔湾区',LWData],['天河区',THData],['白云区',BYData],['黄埔区',HPData],['花都区',HDData],
+            ['番禺区',PYData],['南沙区',NSData],['萝岗区',LGData],['从化区',CHData],['增城区',ZCData]].forEach(function (item, i) {
+            // alert(JSON.stringify(item));
+            series.push({
+                    name: item[0],
+                    coordinateSystem: 'bmap',
+                    type: 'lines',
+                    zlevel: 1,
+                    effect: {
+                        show: true,
+                        period: 6,
+                        trailLength: 0.7,
+                        color: '#fff',
+                        symbolSize: 3
+                    },
+                    lineStyle: {
+                        normal: {
+                            color: color[i],
+                            width: 0,
+                            curveness: 0.2
+                        }
+                    },
+                    data: convertData(item[1]),
+                },
+                {
+                    name: item[0],
+                    type: 'lines',
+                    coordinateSystem: 'bmap',
+                    zlevel: 2,
+                    effect: {
+                        show: true,
+                        period: 6,
+                        trailLength: 0,
+                        symbol: planePath,
+                        symbolSize: 15
+
+                    },
+                    lineStyle: {
+                        normal: {
+                            color: color[i],
+                            width: 1,
+                            opacity: 0.4,
+                            curveness: 0.2
+                        }
+                    },
+                    data: convertData(item[1])
+                },
+                {
+                    name: item[0],
+                    type: 'effectScatter',
+                    // coordinateSystem: 'geo',
+                    coordinateSystem: 'bmap',
+                    zlevel: 2,
+                    rippleEffect: {
+                        brushType: 'stroke'
+                    },
+                    label: {
+                        normal: {
+                            show: true,
+                            position: 'right',
+                            formatter: '{b}'
+                        }
+                    },
+                    // symbolSize: function (val) {
+                    //     return val[2] / 8;
+                    // },
+                    itemStyle: {
+                        normal: {
+                            color: color[i]
+                        }
+                    },
+                    data: item[1].map(function (dataItem) {
+                        return {
+                            name: dataItem[1].name,
+                            value: geoCoordMap[dataItem[1].name].concat([dataItem[1].value])
+                        };
+                    })
+                });
+        });
+
+        var option = {
+            bmap: {
+                center: [113.3531911431, 23.1264654617],
+                // zoom: 12,
+                zoom: 11,
+                roam: true,
+                mapStyle: baiduMapStyle,
+            },
+            backgroundColor: '#404a59',
+            tooltip : {
+                trigger: 'item',
+                formatter:function (item) {
+//                    console.log(JSON.stringify(item))
+                }
+            },
+            legend: {
+                show:false,
+                orient: 'vertical',
+                top: 'bottom',
+                left: 'right',
+                data:['海珠区','荔湾区','天河区','白云区','黄埔区','花都区','番禺区','南沙区','萝岗区','从化区','增城区'],
+                textStyle: {
+                    color: '#fff'
+                },
+                selectedMode: 'single'
+            },
+            // geo: {
+            //     // map: 'china',
+            //     map: 'guangzhou',
+            //     label: {
+            //         emphasis: {
+            //             show: false
+            //         }
+            //     },
+            //     roam: true,
+            //     itemStyle: {
+            //         normal: {
+            //             areaColor: '#323c48',
+            //             borderColor: '#404a59'
+            //         },
+            //         emphasis: {
+            //             areaColor: '#2a333d'
+            //         }
+            //     }
+            // },
+            series: series,
+        };
+
+        // 使用刚指定的配置项和数据显示图表。
+        myChart.setOption(option);
+
+
+        //信息窗体
+        var infoBox;
+
+
+
+
+        myChart.on('click', function (params) {
+            // 控制台打印数据的名称
+            console.log(params.name);
+            if ('series' == params.componentType&&'effectScatter' == params.seriesType){
+//                 alert(JSON.stringify(params.value));
+                myChart.dispatchAction({
+                    type: 'legendSelect',
+                    // 图例名称
+                    name: params.name
+                });
+
+                var html = '<div class="keliu-form">';
+                html += '<div class="txt-center p-bottom">天河区客流交换量</div>';
+                html += '<div class="keliu-form-con" style="position: relative"><div id="passengerFlowSwitchChart" class="chartStyle"></div></div>';
+                html += '<em></em>';
+                html += '<span class="down-arrow"></span></div>';
+
+
+
+                //如果infoBox不为空要关闭
+                if (!ticc.isNull(infoBox)){
+                    infoBox.close();
+                    infoBox = null;
+                }
+                infoBox = baiduMapUtil.createInfoBox(html,new BMap.Size(0, 10));
+//                infoBox.open(marker.getPosition());
+                $('div.infoBox>img').prop('src','').css('display','none');
+                infoBox.open(new BMap.Marker(new BMap.Point((params.value)[0],(params.value)[1]), null));
+//                infoBox.setPosition(new BMap.Point((params.value)[0],(params.value)[1]));
+                //防止默认的关闭按钮图片404
+                $('div.infoBox>img').prop('src','').css('display','none');
+//                $('div.infoBox>img').css('display','none');
+                $('div.keliu-form>em').on("click",function () {
+                    infoBox.close();
+                });
+                dispalyPassengerFlowSwitchChart();
+            }
+        });
+
+        //百度地图
+        var regionODDistriMap = myChart.getModel().getComponent('bmap').getBMap();
+        baiduMapUtil.setMap(regionODDistriMap);
+        regionODDistriMap.setMapStyle({styleJson:baiduMapStyle});
+
+
+
+        /*#######################################*/
+
+        /*客流量交换量柱状图开始*/
+        var dispalyPassengerFlowSwitchChart = function () {
+            // 基于准备好的dom，初始化echarts实例
+            var passengerFlowSwitchChart = echarts.init(document.getElementById('passengerFlowSwitchChart'));
+
+            // 指定图表的配置项和数据
+            var passengerFlowSwitchChartOption = {
+//                backgroundColor: 'rgba(0,0,0,0.8)',
+                // title: {
+
+                //     textStyle: {
+                //         color: '#00FFFF',
+                //         fontSize: 24
+                //     }
+                // },
+                legend: {
+//                    top:20,
+                    itemWidth:20,
+                    itemHeight:8,
+                    right: 20,
+                    textStyle: {
+                        color: '#fff',
+                    },
+                    data: ['发送量', '接收量']
+                },
+                grid: {
+                    top:'5%',
+                    left: '3%',
+                    right: '4%',
+                    bottom: '10%',
+                    containLabel: true
+                },
+
+                tooltip: {
+                    show: "true",
+                    trigger: 'item',
+                    backgroundColor: 'rgba(0,0,0,0.7)', // 背景
+                    padding: [8, 10], //内边距
+                    extraCssText: 'box-shadow: 0 0 3px rgba(255, 255, 255, 0.4);', //添加阴影
+                    formatter: function(params) {
+                        if (params.seriesIndex == "2" || params.seriesIndex == "3") {
+                            return params.name + '<br>' + params.seriesName + ' ： 第 ' + params.value + ' 名';
+                        }
+                    }
+                },
+                yAxis: {
+                    type: 'value',
+                    axisTick: {
+                        show: false
+                    },
+                    axisLine: {
+                        show: false,
+                        lineStyle: {
+                            color: '#363e83',
+                        }
+                    },
+                    splitLine: {
+                        show: true,
+                        lineStyle: {
+                            color: "rgba(255,255,255,0.2)",
+                        }
+                    },
+                    axisLabel: {
+                        textStyle: {
+                            color: 'rgba(255,255,255,0.5)',
+                            fontWeight: 'normal',
+                            fontSize: '12',
+                        },
+                    },
+                },
+                xAxis: [{
+                    type: 'category',
+                    axisTick: {
+                        show: false
+                    },
+                    axisLine: {
+                        show: true,
+                        lineStyle: {
+                            color: "rgba(255,255,255,0.5)",
+                        }
+                    },
+                    axisLabel: {
+                        inside: false,
+                        textStyle: {
+                            color: "rgba(255,255,255,0.9)",
+                            fontWeight: 'normal',
+                            fontSize: '12',
+                        },
+                        // formatter:function(val){
+                        //     return val.split("").join("\n")
+                        // },
+                    },
+                    data: ['天河区', '越秀区', '荔湾区','海珠区','黄埔区','白云区']
+                }, {
+                    type: 'category',
+                    axisLine: {
+                        show: false
+                    },
+                    axisTick: {
+                        show: false
+                    },
+                    axisLabel: {
+                        show: false
+                    },
+                    splitArea: {
+                        show: false
+                    },
+                    splitLine: {
+                        show: false
+                    },
+                    data: ['天河区', '越秀区', '荔湾区','海珠区','黄埔区','白云区']
+                },
+
+                ],
+                series: [{
+                    type: 'bar',
+                    xAxisIndex: 1,
+                    zlevel: 1,
+                    itemStyle: {
+                        normal: {
+                            color: 'rgba(255,255,255,0.31)',
+                            borderWidth: 0,
+                            shadowBlur: {
+                                shadowColor: 'rgba(255,255,255,0.31)',
+                                shadowBlur: 10,
+                                shadowOffsetX: 0,
+                                shadowOffsetY: 2,
+                            },
+                        }
+                    },
+                    barWidth: '10%',
+                    data: [30, 30, 30,30, 30, 30]
+                }, {
+                    type: 'bar',
+                    xAxisIndex: 1,
+                    barGap: '100%',
+                    data: [30, 30, 30,30, 30, 30],
+                    zlevel: 1,
+                    barWidth: '10%',
+                    itemStyle: {
+                        normal: {
+                            color: 'rgba(255,255,255,0.31)',
+                            borderWidth: 0,
+                            shadowBlur: {
+                                shadowColor: 'rgba(255,255,255,0.31)',
+                                shadowBlur: 10,
+                                shadowOffsetX: 0,
+                                shadowOffsetY: 2,
+                            },
+                        }
+                    },
+                },{
+                    name: '发送量',
+                    type: 'bar',
+                    itemStyle: {
+                        normal: {
+                            show: true,
+                            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
+                                offset: 0,
+                                color: '#50CDF6'
+                            }, {
+                                offset: 1,
+                                color: '#50CDF6'
+                            }]),
+                            barBorderRadius: 10,
+                            borderWidth: 0,
+                        }
+                    },
+                    zlevel: 2,
+                    barWidth: '10%',
+                    data: [8, 15, 10,8, 15, 10]
+                }, {
+                    name: '接收量',
+                    type: 'bar',
+                    barWidth: '10%',
+                    itemStyle: {
+                        normal: {
+                            show: true,
+                            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
+                                offset: 0,
+                                color: '#ED5655'
+                            }, {
+                                offset: 1,
+                                color: '#ED5655'
+                            }]),
+                            barBorderRadius: 10,
+                            borderWidth: 0,
+                        }
+                    },
+                    zlevel: 2,
+                    barGap: '100%',
+                    data: [8, 17, 26,8, 17, 26]
+                }]
+            };
+            // 使用刚指定的配置项和数据显示图表。
+            passengerFlowSwitchChart.setOption(passengerFlowSwitchChartOption);
+        };
+        /*客流量交换量柱状图结束*/
+
+        /*##############################################*/
+
+    });
+
+</script>
+</html>

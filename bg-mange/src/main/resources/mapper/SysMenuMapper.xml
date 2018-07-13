@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.zcp.bgmange.frame.dao.ISysMenuDao" >
+
+	<!-- 表与实体映射 -->
+	<resultMap id="SysMenuCustomMap" type="SysMenuCustom">
+		<id property="sysMenuId" column="sysMenuId" />
+		<result property="sysMenuNo" column="sysMenuNo" />
+		<result property="sysMenuName" column="sysMenuName" />
+		<result property="sysMenuUrl" column="sysMenuUrl" />
+		<result property="parentNo" column="parentNo" />
+		<result property="levelCode" column="levelCode" />
+		<result property="sysMenuIconCls" column="sysMenuIconCls" />
+		<result property="sysMenuExecuteJs" column="sysMenuExecuteJs" />
+		<result property="sysMenuOpenStyle" column="sysMenuOpenStyle" />
+		<result property="useStatus" column="useStatus" />
+		<result property="createTime" column="createTime" />
+	</resultMap>
+
+	<!-- 查询条件的sql片段 -->
+	<sql id="query_sys_menu">
+		<if test="null != sysMenuCustom">
+			<!-- ${}拼接字符串，有sql注入的维修，少用 -->
+			<if test="null != sysMenuCustom.sysMenuNo and '' != sysMenuCustom.sysMenuNo">
+				AND sysMenuNo LIKE CONCAT('%',CONCAT(#{sysMenuCustom.sysMenuNo},'%'))
+			</if>
+			<if test="null != sysMenuCustom.sysMenuName and '' != sysMenuCustom.sysMenuName">
+				AND sysMenuName LIKE CONCAT('%',CONCAT(#{sysMenuCustom.sysMenuName},'%'))
+			</if>
+			<if test="null != sysMenuCustom.levelCode and '' != sysMenuCustom.levelCode">
+				AND levelCode = #{sysMenuCustom.levelCode}
+			</if>
+			<if test="null != sysMenuCustom.parentNo and '' != sysMenuCustom.parentNo">
+				AND parentNo = #{sysMenuCustom.parentNo}
+			</if>
+			<if test="null != sysMenuCustom.useStatus and '' != sysMenuCustom.useStatus">
+				AND useStatus = #{sysMenuCustom.useStatus}
+			</if>
+		</if>
+	</sql>
+	
+	<!-- 查询 -->
+	<!-- 
+		parameterType传入包装对象(包装了查询条件)
+  		resultType建议使用扩展对象
+  	 -->
+	<select id="queryObjs" parameterType="SysMenuQueryVo" resultMap="SysMenuCustomMap">
+
+		SELECT m.* from tb_sys_menu m
+		<where>
+			<!-- 引用sql片段 的id,如果refid指定的id不在本mapper文件中,要前边加namespace -->
+			<include refid="query_sys_menu"></include>
+		</where>
+		<if test="null != orderBy and '' != orderBy">
+			ORDER BY ${orderBy}
+		</if>
+		<if test="null != start and null != rows">
+			limit #{start},#{rows}
+		</if>
+	</select>
+
+	<select id="queryObj" parameterType="java.lang.String" resultMap="SysMenuCustomMap">
+		SELECT m.* FROM tb_sys_menu m
+		<where>
+			AND sysMenuId = #{pk}
+		</where>
+	</select>
+
+	<select id="queryObjsBypks" parameterType="java.util.List" resultMap="SysMenuCustomMap">
+		SELECT * FROM tb_sys_menu WHERE sysMenuId IN
+		<foreach collection="list" open="(" close=")" separator="," item="pk">
+			#{pk}
+		</foreach>
+	</select>
+
+	<select id="queryCount" parameterType="SysMenuQueryVo" resultType="java.lang.Long">
+		SELECT count(1) FROM tb_sys_menu
+		<where>
+			<include refid="query_sys_menu"></include>
+		</where>
+	</select>
+
+	<select id="queryComboBox" resultType="ComboBox">
+		select m.sysmenuno as id,m.sysmenuname as text from tb_sys_menu m
+		<where>
+			<include refid="query_sys_menu"></include>
+		</where>
+		order by m.createtime desc
+	</select>
+
+	<!--添加-->
+	<insert id="insert" parameterType="SysMenuCustom" useGeneratedKeys="true" keyProperty="sysMenuId">
+		INSERT INTO tb_sys_menu
+			(
+				sysMenuNo,
+				sysMenuName,
+				sysMenuUrl,
+				parentNo,
+				levelCode,
+				sysMenuIconCls,
+				sysMenuExecuteJs,
+				sysMenuOpenStyle,
+				useStatus,
+				createTime
+			)
+		VALUES
+			(
+				#{sysMenuNo,jdbcType=VARCHAR},
+				#{sysMenuName,jdbcType=VARCHAR},
+				#{sysMenuUrl,jdbcType=VARCHAR},
+				#{parentNo,jdbcType=VARCHAR},
+				#{levelCode,jdbcType=VARCHAR},
+				#{sysMenuIconCls,jdbcType=VARCHAR},
+				#{sysMenuExecuteJs,jdbcType=VARCHAR},
+				#{sysMenuOpenStyle,jdbcType=VARCHAR},
+				#{useStatus,jdbcType=VARCHAR},
+				#{createTime,jdbcType=TIMESTAMP}
+			)
+	</insert>
+
+	<!-- 修改 -->
+	<update id="update" parameterType="SysMenuCustom">
+		update tb_sys_menu
+		<set>
+			<if test="sysMenuNo != null">sysMenuNo = #{sysMenuNo},</if>
+			<if test="sysMenuName != null">sysMenuName = #{sysMenuName},</if>
+			<if test="sysMenuUrl != null">sysMenuUrl = #{sysMenuUrl},</if>
+			<if test="parentNo != null">parentNo = #{parentNo},</if>
+			<if test="levelCode != null">levelCode = #{levelCode},</if>
+			<if test="sysMenuIconCls != null">sysMenuIconCls = #{sysMenuIconCls},</if>
+			<if test="sysMenuExecuteJs != null">sysMenuExecuteJs = #{sysMenuExecuteJs},</if>
+			<if test="sysMenuOpenStyle != null">sysMenuOpenStyle = #{sysMenuOpenStyle},</if>
+			<if test="useStatus != null">useStatus = #{useStatus},</if>
+		</set>
+		where sysMenuId = #{sysMenuId}
+	</update>
+<!--
+	<update id="update" parameterType="SysMenuCustom">
+		update tb_sys_menu
+		set
+			sysMenuNo = #{sysMenuNo,jdbcType=VARCHAR},
+			sysMenuName = #{sysMenuName,jdbcType=VARCHAR},
+			sysMenuUrl = #{sysMenuUrl,jdbcType=VARCHAR},
+			parentNo = #{parentNo,jdbcType=VARCHAR},
+			levelCode = #{levelCode,jdbcType=VARCHAR},
+			sysMenuIconCls = #{sysMenuIconCls,jdbcType=VARCHAR},
+			sysMenuExecuteJs = #{sysMenuExecuteJs,jdbcType=VARCHAR},
+			sysMenuOpenStyle = #{sysMenuOpenStyle,jdbcType=VARCHAR},
+			useStatus = #{useStatus,jdbcType=VARCHAR}
+		where sysMenuId = #{sysMenuId}
+	</update>
+-->
+
+	<!-- 删除 -->
+	<delete id="delete" parameterType="SysMenuCustom">
+		delete from tb_sys_menu where sysMenuId = #{sysMenuId}
+	</delete>
+
+	<!---->
+	<!-- 通过主键批量删除-->
+	<delete id="deleteList">
+		delete from tb_sys_menu where sysMenuId in
+		<foreach collection="array" open="(" close=")" separator="," item="pk">
+			#{pk}
+		</foreach>
+	</delete>
+
+
+
+	<!--删除中间表记录-->
+	<delete id="deleteSysMenuSysRole" parameterType="java.lang.String">
+		DELETE FROM tbot_role_menu WHERE sysMenuNo = #{sysMenuNo,jdbcType=VARCHAR}
+	</delete>
+	<!--删除中间表记录通过多个sysRoleNo-->
+	<delete id="deleteMulSysMenuSysRole">
+		DELETE FROM tbot_role_menu WHERE sysMenuNo IN
+		<foreach collection="array" open="(" close=")" separator="," item="sysMenuNo">
+			#{sysMenuNo}
+		</foreach>
+	</delete>
+
+</mapper>

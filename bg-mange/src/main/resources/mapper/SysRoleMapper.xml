@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.zcp.bgmange.frame.dao.ISysRoleDao" >
+
+	<!-- 表与实体映射 -->
+	<resultMap id="SysRoleCustomMap" type="SysRoleCustom">
+		<id property="roleId" column="roleId" />
+		<result property="roleNo" column="roleNo" />
+		<result property="roleName" column="roleName" />
+		<result property="remark" column="remark" />
+		<result property="useStatus" column="useStatus" />
+		<result property="createTime" column="createTime" />
+	</resultMap>
+
+	<!-- 继承上面那个基本的映射,再扩展出级联查询 -->
+	<resultMap id="SysRoleSysMenuSysRoleMap" type="SysRoleCustom" extends="SysRoleCustomMap">
+		<collection property="sysMenuSysRoles" resultMap="SysMenuSysRoleMap"></collection>
+	</resultMap>
+	<resultMap id="SysMenuSysRoleMap" type="SysMenuSysRole">
+		<result property="sysMenuNo" column="sysMenuNo" />
+		<result property="sysRoleNo" column="sysRoleNo" />
+	</resultMap>
+
+	<!-- 查询条件的sql片段 -->
+	<sql id="query_sys_role">
+		<if test="null != sysRoleCustom">
+			<!-- ${}拼接字符串，有sql注入的维修，少用 -->
+			<if test="null != sysRoleCustom.roleNo and '' != sysRoleCustom.roleNo">
+				AND roleNo LIKE CONCAT('%',CONCAT(#{sysRoleCustom.roleNo},'%'))
+			</if>
+			<if test="null != sysRoleCustom.roleName and '' != sysRoleCustom.roleName">
+				AND roleName LIKE CONCAT('%',CONCAT(#{sysRoleCustom.roleName},'%'))
+			</if>
+			<if test="null != sysRoleCustom.useStatus and '' != sysRoleCustom.useStatus">
+				AND useStatus = #{sysRoleCustom.useStatus}
+			</if>
+		</if>
+	</sql>
+	
+	<!-- 查询 -->
+	<!-- 
+		parameterType传入包装对象(包装了查询条件)
+  		resultType建议使用扩展对象
+  	 -->
+	<select id="queryObjs" parameterType="SysRoleQueryVo" resultMap="SysRoleCustomMap">
+
+		SELECT r.* from tb_sys_role r
+		<where>
+			<!-- 引用sql片段 的id,如果refid指定的id不在本mapper文件中,要前边加namespace -->
+			<include refid="query_sys_role"></include>
+		</where>
+		ORDER BY createTime DESC
+		<if test="null != start and null != rows">
+			limit #{start},#{rows}
+		</if>
+	</select>
+
+	<select id="queryObj" parameterType="java.lang.String" resultMap="SysRoleSysMenuSysRoleMap">
+		SELECT r.*,rm.* FROM tb_sys_role r left join tb_role_menu rm on r.roleNo = rm.sysRoleNo
+		<where>
+			AND roleId = #{pk}
+		</where>
+	</select>
+
+
+	<select id="queryObjsBypks" parameterType="java.util.List" resultMap="SysRoleSysMenuSysRoleMap">
+		SELECT * FROM tb_sys_role WHERE roleId IN
+		<foreach collection="list" open="(" close=")" separator="," item="pk">
+			#{pk}
+		</foreach>
+	</select>
+	<!--<select id="queryObj" parameterType="java.lang.String" resultMap="SysRoleCustomMap">-->
+		<!--SELECT r.* FROM tb_sys_role r-->
+		<!--<where>-->
+			<!--AND roleId = #{pk}-->
+		<!--</where>-->
+	<!--</select>-->
+
+	<select id="queryCount" parameterType="SysRoleQueryVo" resultType="java.lang.Long">
+		SELECT count(1) FROM tb_sys_role
+		<where>
+			<include refid="query_sys_role"></include>
+		</where>
+	</select>
+
+	<select id="queryComboBox" parameterType="SysRoleQueryVo" resultType="ComboBox">
+		SELECT s.roleNo AS id,s.roleName AS text FROM tb_sys_role s
+		<where>
+			<include refid="query_sys_role"></include>
+		</where>
+		ORDER BY s.createTime DESC
+	</select>
+
+	<!--添加-->
+	<insert id="insert" parameterType="SysRoleCustom" useGeneratedKeys="true" keyProperty="roleId">
+		INSERT INTO tb_sys_role
+			(
+				roleNo,
+				roleName,
+				remark,
+				useStatus,
+				createTime
+			)
+		VALUES
+			(
+				#{roleNo,jdbcType=VARCHAR},
+				#{roleName,jdbcType=VARCHAR},
+				#{remark,jdbcType=VARCHAR},
+				#{useStatus,jdbcType=CHAR},
+				#{createTime,jdbcType=TIMESTAMP}
+			)
+	</insert>
+
+	<!-- 修改 -->
+	<update id="update" parameterType="SysRoleCustom">
+		UPDATE tb_sys_role
+		<set>
+			<if test="roleNo != null">roleNo = #{roleNo},</if>
+			<if test="roleName != null">roleName = #{roleName},</if>
+			<if test="remark != null">remark = #{remark},</if>
+			<if test="useStatus != null">useStatus = #{useStatus},</if>
+		</set>
+		WHERE roleId = #{roleId}
+	</update>
+	<!--<update id="update" parameterType="SysRoleCustom">-->
+		<!--UPDATE tb_sys_role-->
+		<!--SET-->
+			<!--roleNo = #{roleNo,jdbcType=VARCHAR},-->
+			<!--roleName = #{roleName,jdbcType=VARCHAR},-->
+			<!--remark = #{remark,jdbcType=VARCHAR},-->
+			<!--useStatus = #{useStatus,jdbcType=CHAR}-->
+		<!--WHERE roleId = #{roleId}-->
+	<!--</update>-->
+
+	<!-- 删除 -->
+	<delete id="delete" parameterType="SysRoleCustom">
+		DELETE FROM tb_sys_role WHERE roleId = #{roleId}
+	</delete>
+
+	<!-- 通过主键批量删除-->
+	<delete id="deleteList">
+		DELETE FROM tb_sys_role WHERE roleId IN
+		<foreach collection="array" open="(" close=")" separator="," item="pk">
+			#{pk}
+		</foreach>
+	</delete>
+
+
+	<!--插入记录到中间表-->
+	<insert id="insertSysMenuSysRole" parameterType="java.util.List" useGeneratedKeys="false">
+		INSERT INTO tb_role_menu(sysMenuNo, sysRoleNo) VALUES
+		<foreach collection="list" item="item" index="index" separator =",">
+			(#{item.sysMenuNo,jdbcType=VARCHAR}, #{item.sysRoleNo,jdbcType=VARCHAR})
+		</foreach>
+	</insert>
+
+	<!--删除管理员角色表的记录-->
+	<delete id="deleteAdminSysRole" parameterType="java.lang.String">
+		DELETE FROM tb_admin_role WHERE roleNo = #{sysRoleNo,jdbcType=VARCHAR}
+	</delete>
+	<!--删除管理员角色表的记录-->
+	<delete id="deleteMulAdminSysRole">
+		DELETE FROM tb_admin_role WHERE roleNo IN
+		<foreach collection="array" open="(" close=")" separator="," item="sysRoleNo">
+			#{sysRoleNo}
+		</foreach>
+	</delete>
+
+	<!--删除中间表记录-->
+	<delete id="deleteSysMenuSysRole" parameterType="java.lang.String">
+		DELETE FROM tb_role_menu WHERE sysRoleNo = #{sysRoleNo,jdbcType=VARCHAR}
+	</delete>
+	<!--删除中间表记录通过多个sysRoleNo-->
+	<delete id="deleteMulSysMenuSysRole">
+		DELETE FROM tb_role_menu WHERE sysRoleNo IN
+		<foreach collection="array" open="(" close=")" separator="," item="sysRoleNo">
+			#{sysRoleNo}
+		</foreach>
+	</delete>
+
+	<!--查询中间表记录-->
+	<select id="querySysMenuSysRole" parameterType="java.lang.String" resultType="SysMenuSysRole">
+		SELECT * FROM tb_role_menu WHERE sysRoleNo = #{sysRoleNo,jdbcType=VARCHAR}
+	</select>
+
+	<!--查询中间表记录通过多个角色编号-->
+	<select id="querySysMenuSysRoleBySysRoleNos" parameterType="java.util.List" resultType="SysMenuSysRole">
+		SELECT * FROM tb_role_menu WHERE sysRoleNo IN
+		<foreach collection="list" open="(" close=")" separator="," item="sysRoleNo">
+			#{sysRoleNo,jdbcType=VARCHAR}
+		</foreach>
+	</select>
+</mapper>

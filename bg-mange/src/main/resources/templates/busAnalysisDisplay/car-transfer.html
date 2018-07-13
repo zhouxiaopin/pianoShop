@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,height=device-height, minimum-scale=1.0, maximum-scale=1.0">
+    <title>车辆换乘</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/static/busAnalysisDisplay/css/style.css}" />
+    <script  th:src="@{/static/busAnalysisDisplay/js/jquery-1.11.1.min.js}"></script>
+    <script type="text/javascript">
+        (function(){
+            function sizeHtml(){
+                window.mtSizeBase = $(window).width()/32;
+                //window.mtSizeBase = window.mtSizeBase>45?45:window.mtSizeBase;
+                $("html").css("font-size",window.mtSizeBase+"px");
+            }
+            sizeHtml();
+            $(window).resize(function(){
+                setTimeout(function(){
+                    sizeHtml();
+                },300);
+            });
+        })();
+</script>
+</head>
+<body class="common-bg" style="overflow:hidden;">
+    <h3 class="head-img"></h3>
+    <div class="content-body">
+        <div class="nav-crosswise">
+            <div class="nav-crosswise-main c-fff"><span>当前位置</span>><span>地图展示</span>><span>车辆换乘</span></div>
+        </div>
+        <div class="main-area clearfix">
+            <div class="lengthways-nav fl" id="side-menu">
+                <div class="map-show-nav selected">
+                    <ul>
+                        <li class="active">
+                            <span class="J_menuItem"><img th:src="@{/static/busAnalysisDisplay/images/quan.png}">地图展示</span>
+                            <ul>
+                                <li><a href="traffic-monitoring.html" th:href="@{/page/passengerFlowMonitor}">客流监控</a></li>
+                                <li><a href="car-monitoring.html" th:href="@{/page/busMonitor}">车辆监控</a></li>
+                                <li><a href="javascript:;" class="on">车辆换乘</a></li>
+                                <li><a href="od-fenbu.html" th:href="@{/page/regionODDistri}">区域OD分布</a></li>
+                                <li><a href="alarm-msg.html" th:href="@{/page/alarmMsg}">报警信息</a></li>
+                            </ul>
+                        </li>
+                        <li >
+                            <span class="J_menuItem"><img th:src="@{/static/busAnalysisDisplay/images/quan.png}">数据分析</span>
+                            <ul>
+                                <li>
+                                    <span class="J_menuItem">公交客运</span>
+                                    <ul>
+                                        <li><a href="passenger-form.html" th:href="@{/page/passenVolumeCons}">客运量构成</a></li>
+                                        <li><a href="brush-card-number.html" th:href="@{/page/swingCardVolumeStati}">刷卡量统计</a></li>
+                                    </ul>
+                                </li>
+                                <li>
+                                    <span class="J_menuItem">公交运行</span>
+                                    <ul>
+                                        <li><a href="gaofeng-chart.html" th:href="@{/page/peakRun}">高峰运行图</a></li>
+                                        <li><a href="running-speed-chart.html" th:href="@{/page/runSpeedStati}">运行速度统计</a></li>
+                                        <li><a href="traffic-zhishu.html" th:href="@{/page/trafficNum}">交通指数</a></li>
+                                        <li><a href="traffic-routes.html" th:href="@{/page/congestionRoad}">拥堵路段</a></li>
+                                    </ul>
+                                </li>
+                                <li>
+                                    <span class="J_menuItem">换乘分析</span>
+                                    <ul>
+                                        <li><a href="transfer-form.html" th:href="@{/page/transChangeCons}">换乘量构成</a></li>
+                                        <li><a href="transfer-tongji.html" th:href="@{/page/transChangeStati}">换乘量统计</a></li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+
+            </div>
+            <div class="map-area fr " id="content">
+
+                <!--<img src="images/map.jpg" alt="" />-->
+                <!--#######################################-->
+
+                <!--地图开始-->
+                <div id="busTransformMap" class="mapStyle">
+                </div>
+                <!--地图结束-->
+
+                <div class="rank-pup" id="pup">
+                    <h4 class="num" id="busTransferSum">0</h4>
+                    <p class="title">今日换乘总数（次）</p>
+                    <div class="search">
+                        <input id="searchInput" type="search" name="" placeholder="站点名" />
+                    </div>
+                    <div class="rank-title">换乘次数排名 TOP10</div>
+                    <ul class="top-ul">
+                        <li  class="active"><span>站点</span></li>
+                        <li><span>线路</span></li>
+                    </ul>
+                    <ul class="rank-data">
+                        <li>
+                            <ul class="progress-wrap" id="stationTransferTop10">
+                                <li>
+                                    <span class="rank-num"><em>1</em></span>
+                                    <div class="progress">
+                                        <div class="info">
+                                            <span class="name" title="珠江新城站">珠江新城站</span>
+                                            <span class="name-right">751次 &nbsp; &nbsp;18.2%</span>
+                                        </div>
+                                        <div class="progress-bar">
+                                            <div class="progress-inner">
+                                                <!-- <div class="progress-inner"></div> -->
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li>
+                                    <span class="rank-num"><em>2</em></span>
+                                    <div class="progress">
+                                        <div class="info">
+                                            <span class="name" title="珠江新城站">珠江新城站</span>
+                                            <span class="name-right">751次 &nbsp; &nbsp;18.2%</span>
+                                        </div>
+                                        <div class="progress-bar">
+                                            <div class="progress-inner">
+                                                <!-- <div class="progress-inner"></div> -->
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li>
+                                    <span class="rank-num"><em>3</em></span>
+                                    <div class="progress">
+                                        <div class="info">
+                                            <span class="name" title="珠江新城站">珠江新城站</span>
+                                            <span class="name-right">751次 &nbsp; &nbsp;18.2%</span>
+                                        </div>
+                                        <div class="progress-bar">
+                                            <div class="progress-inner">
+                                                <!-- <div class="progress-inner"></div> -->
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li>
+                                    <span class="rank-num"><em>4</em></span>
+                                    <div class="progress">
+                                        <div class="info">
+                                            <span class="name" title="珠江新城站">珠江新城站</span>
+                                            <span class="name-right">751次 &nbsp; &nbsp;18.2%</span>
+                                        </div>
+                                        <div class="progress-bar">
+                                            <div class="progress-inner">
+                                                <!-- <div class="progress-inner"></div> -->
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li>
+                                    <span class="rank-num"><em>5</em></span>
+                                    <div class="progress">
+                                        <div class="info">
+                                            <span class="name" title="珠江新城站">珠江新城站</span>
+                                            <span class="name-right">751次 &nbsp; &nbsp;18.2%</span>
+                                        </div>
+                                        <div class="progress-bar">
+                                            <div class="progress-inner">
+                                                <!-- <div class="progress-inner"></div> -->
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li>
+                                    <span class="rank-num"><em>6</em></span>
+                                    <div class="progress">
+                                        <div class="info">
+                                            <span class="name" title="珠江新城站">珠江新城站</span>
+                                            <span class="name-right">751次 &nbsp; &nbsp;18.2%</span>
+                                        </div>
+                                        <div class="progress-bar">
+                                            <div class="progress-inner">
+                                                <!-- <div class="progress-inner"></div> -->
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li>
+                                    <span class="rank-num"><em>7</em></span>
+                                    <div class="progress">
+                                        <div class="info">
+                                            <span class="name" title="珠江新城站">珠江新城站</span>
+                                            <span class="name-right">751次 &nbsp; &nbsp;18.2%</span>
+                                        </div>
+                                        <div class="progress-bar">
+                                            <div class="progress-inner">
+                                                <!-- <div class="progress-inner"></div> -->
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li>
+                                    <span class="rank-num"><em>8</em></span>
+                                    <div class="progress">
+                                        <div class="info">
+                                            <span class="name" title="珠江新城站">珠江新城站</span>
+                                            <span class="name-right">751次 &nbsp; &nbsp;18.2%</span>
+                                        </div>
+                                        <div class="progress-bar">
+                                            <div class="progress-inner">
+                                                <!-- <div class="progress-inner"></div> -->
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li>
+                                    <span class="rank-num"><em>9</em></span>
+                                    <div class="progress">
+                                        <div class="info">
+                                            <span class="name" title="珠江新城站">珠江新城站</span>
+                                            <span class="name-right">751次 &nbsp; &nbsp;18.2%</span>
+                                        </div>
+                                        <div class="progress-bar">
+                                            <div class="progress-inner">
+                                                <!-- <div class="progress-inner"></div> -->
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li>
+                                    <span class="rank-num"><em>10</em></span>
+                                    <div class="progress">
+                                        <div class="info">
+                                            <span class="name" title="珠江新城站">珠江新城站</span>
+                                            <span class="name-right">751次 &nbsp; &nbsp;18.2%</span>
+                                        </div>
+                                        <div class="progress-bar">
+                                            <div class="progress-inner">
+                                                <!-- <div class="progress-inner"></div> -->
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                            </ul>
+                        </li>
+                        <li>
+                        <ul class="progress-wrap" id="lineTransferTop10">
+                                <li>
+                                    <span class="rank-num"><em>1</em></span>
+                                    <div class="progress">
+                                        <div class="info">
+                                            <span class="name" title="珠江新城线">珠江新城线</span>
+                                            <span class="name-right">751次 &nbsp; &nbsp;18.2%</span>
+                                        </div>
+                                        <div class="progress-bar">
+                                            <div class="progress-inner">
+                                                <!-- <div class="progress-inner"></div> -->
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li>
+                                    <span class="rank-num"><em>2</em></span>
+                                    <div class="progress">
+                                        <div class="info">
+                                            <span class="name" title="珠江新城线">珠江新城线</span>
+                                            <span class="name-right">751次 &nbsp; &nbsp;18.2%</span>
+                                        </div>
+                                        <div class="progress-bar">
+                                            <div class="progress-inner">
+                                                <!-- <div class="progress-inner"></div> -->
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li>
+                                    <span class="rank-num"><em>3</em></span>
+                                    <div class="progress">
+                                        <div class="info">
+                                            <span class="name" title="珠江新城线">珠江新城线</span>
+                                            <span class="name-right">751次 &nbsp; &nbsp;18.2%</span>
+                                        </div>
+                                        <div class="progress-bar">
+                                            <div class="progress-inner">
+                                                <!-- <div class="progress-inner"></div> -->
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li>
+                                    <span class="rank-num"><em>4</em></span>
+                                    <div class="progress">
+                                        <div class="info">
+                                            <span class="name" title="珠江新城线">珠江新城线</span>
+                                            <span class="name-right">751次 &nbsp; &nbsp;18.2%</span>
+                                        </div>
+                                        <div class="progress-bar">
+                                            <div class="progress-inner">
+                                                <!-- <div class="progress-inner"></div> -->
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li>
+                                    <span class="rank-num"><em>5</em></span>
+                                    <div class="progress">
+                                        <div class="info">
+                                            <span class="name" title="珠江新城线">珠江新城线</span>
+                                            <span class="name-right">751次 &nbsp; &nbsp;18.2%</span>
+                                        </div>
+                                        <div class="progress-bar">
+                                            <div class="progress-inner">
+                                                <!-- <div class="progress-inner"></div> -->
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li>
+                                    <span class="rank-num"><em>6</em></span>
+                                    <div class="progress">
+                                        <div class="info">
+                                            <span class="name" title="珠江新城线">珠江新城线</span>
+                                            <span class="name-right">751次 &nbsp; &nbsp;18.2%</span>
+                                        </div>
+                                        <div class="progress-bar">
+                                            <div class="progress-inner">
+                                                <!-- <div class="progress-inner"></div> -->
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li>
+                                    <span class="rank-num"><em>7</em></span>
+                                    <div class="progress">
+                                        <div class="info">
+                                            <span class="name" title="珠江新城线">珠江新城线</span>
+                                            <span class="name-right">751次 &nbsp; &nbsp;18.2%</span>
+                                        </div>
+                                        <div class="progress-bar">
+                                            <div class="progress-inner">
+                                                <!-- <div class="progress-inner"></div> -->
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li>
+                                    <span class="rank-num"><em>8</em></span>
+                                    <div class="progress">
+                                        <div class="info">
+                                            <span class="name" title="珠江新城线">珠江新城线</span>
+                                            <span class="name-right">751次 &nbsp; &nbsp;18.2%</span>
+                                        </div>
+                                        <div class="progress-bar">
+                                            <div class="progress-inner">
+                                                <!-- <div class="progress-inner"></div> -->
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li>
+                                    <span class="rank-num"><em>9</em></span>
+                                    <div class="progress">
+                                        <div class="info">
+                                            <span class="name" title="珠江新城线">珠江新城线</span>
+                                            <span class="name-right">751次 &nbsp; &nbsp;18.2%</span>
+                                        </div>
+                                        <div class="progress-bar">
+                                            <div class="progress-inner">
+                                                <!-- <div class="progress-inner"></div> -->
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li>
+                                    <span class="rank-num"><em>10</em></span>
+                                    <div class="progress">
+                                        <div class="info">
+                                            <span class="name" title="珠江新城线">珠江新城线</span>
+                                            <span class="name-right">751次 &nbsp; &nbsp;18.2%</span>
+                                        </div>
+                                        <div class="progress-bar">
+                                            <div class="progress-inner">
+                                                <!-- <div class="progress-inner"></div> -->
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+<script type="text/javascript" th:replace="common/fragment :: commonVar"></script>
+<script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=fdv5gclnF2HSnNyKm4Dj3aVuLUGMLUZ1" ></script>
+<script type="text/javascript" src="http://api.map.baidu.com/library/TextIconOverlay/1.2/src/TextIconOverlay_min.js" ></script>
+<script type="text/javascript" src="http://api.map.baidu.com/library/MarkerClusterer/1.2/src/MarkerClusterer_min.js"></script>
+<script type="text/javascript" src="http://api.map.baidu.com/library/Heatmap/2.0/src/Heatmap_min.js"></script>
+<!--<script  th:src="@{/static/js/baiduMap/TextIconOverlay_min.js}"></script>-->
+<!--<script  th:src="@{/static/js/baiduMap/MarkerClusterer_min.js}"></script>-->
+<script th:src="@{/static/busAnalysisDisplay/js/baiduMapStyle.js}"></script>
+<script th:src="@{/static/js/prototypeExpand.js}"></script>
+<script th:src="@{/static/js/baiduMapCommon.js}"></script>
+<script th:src="@{/static/js/ticcCommon.js}"></script>
+<script type="text/javascript">
+    //下面是页面的
+    $(function(){
+        var body = (document.compatMode && document.compatMode.toLowerCase() == "css1compat") ? document.documentElement : document.body;
+
+        function ResizeTable() {
+            var sideWidth = document.getElementById("side-menu");
+            var con = document.getElementById('content');
+            var pup = document.getElementById('pup');
+            var pupH = pup.clientHeight;
+
+            sideWidth.style.height = '' + Math.max((body.clientHeight - 100), 0) + "px";
+            con.style.height = '' + Math.max((body.clientHeight - 100), 0) + "px";
+            con.style.width = '' + Math.max((body.clientWidth - 180), 0) + "px";
+            pup.style.top = '' + Math.max((body.clientHeight - pupH)/2, 0) + "px";
+
+
+            var pro = Math.max((con.clientHeight - 100-300), 0) + "px";
+            $(".progress-wrap").css("height",pro)
+        }
+        ResizeTable();
+
+        $(window).resize(function () {
+            ResizeTable()
+        });
+
+        var $item = $(".J_menuItem");
+        $item.on("click",function(){
+            var $this = $(this);
+            $this.siblings("ul").slideToggle(300);
+            $this.parent("li").siblings("li").find("ul").slideUp(300);
+            $this.parent("li").addClass("active").siblings("li").removeClass("active");
+        })
+
+
+        $(".top-ul li").click(function() {
+            var index = $(this).index();
+            $(this).addClass('active').siblings('li').removeClass('active');
+            $(this).parent().siblings('ul').children().hide();
+            $(this).parent().siblings('ul').children().eq(index).show();
+        });
+
+        $(".map-show-ways li").click(function() {
+            $(this).addClass('current').siblings().removeClass('current');
+        });
+
+
+    });
+
+    //业务相关
+    $(function () {
+        // 获取Map实例
+        var busTransformMap = baiduMapUtil.getDisplayMap("busTransformMap");
+        busTransformMap.setMapStyle({styleJson:baiduMapStyle});
+        //加上下面那句才不报错
+        busTransformMap.centerAndZoom(new BMap.Point(113.3405,23.137428), 14);
+
+        /*#######################################*/
+
+        /*显示热力图开始*/
+        var heatmapOverlay = new BMapLib.HeatmapOverlay({"radius":20});
+        var heatmapOverlayInit = function (points) {
+//            alert(JSON.stringify(points));
+
+            points = $.map(points,function (item) {
+               return JSON.parse(item);
+            });
+//            var points =[
+//                {"lng":116.418261,"lat":39.921984,"count":50},
+//                {"lng":116.423332,"lat":39.916532,"count":51},
+//                {"lng":116.419787,"lat":39.930658,"count":15},
+//                {"lng":116.418455,"lat":39.920921,"count":40},
+//                {"lng":116.418843,"lat":39.915516,"count":100},
+//                {"lng":116.42546,"lat":39.918503,"count":6},
+//                {"lng":116.423289,"lat":39.919989,"count":18},
+//                {"lng":116.418162,"lat":39.915051,"count":80},
+//                {"lng":116.422039,"lat":39.91782,"count":11},
+//                {"lng":116.41387,"lat":39.917253,"count":7},
+//                {"lng":116.41773,"lat":39.919426,"count":42},
+//                {"lng":116.421107,"lat":39.916445,"count":4},
+//                {"lng":116.417521,"lat":39.917943,"count":27},
+//                {"lng":116.419812,"lat":39.920836,"count":23},
+//                {"lng":116.420682,"lat":39.91463,"count":60},
+//                {"lng":116.415424,"lat":39.924675,"count":8},
+//                {"lng":116.419242,"lat":39.914509,"count":15},
+//                {"lng":116.422766,"lat":39.921408,"count":25},
+//                {"lng":116.421674,"lat":39.924396,"count":21},
+//                {"lng":116.427268,"lat":39.92267,"count":1},
+//                {"lng":116.417721,"lat":39.920034,"count":51},
+//                {"lng":116.412456,"lat":39.92667,"count":7},
+//                {"lng":116.420432,"lat":39.919114,"count":11},
+//                {"lng":116.425013,"lat":39.921611,"count":35},
+//                {"lng":116.418733,"lat":39.931037,"count":22},
+//                {"lng":116.419336,"lat":39.931134,"count":4},
+//                {"lng":116.413557,"lat":39.923254,"count":5},
+//                {"lng":116.418367,"lat":39.92943,"count":3},
+//                {"lng":116.424312,"lat":39.919621,"count":100},
+//                {"lng":116.423874,"lat":39.919447,"count":87},
+//                {"lng":116.424225,"lat":39.923091,"count":32},
+//                {"lng":116.417801,"lat":39.921854,"count":44},
+//                {"lng":116.417129,"lat":39.928227,"count":21},
+//                {"lng":116.426426,"lat":39.922286,"count":80},
+//                {"lng":116.421597,"lat":39.91948,"count":32},
+//                {"lng":116.423895,"lat":39.920787,"count":26},
+//                {"lng":116.423563,"lat":39.921197,"count":17},
+//                {"lng":116.417982,"lat":39.922547,"count":17},
+//                {"lng":116.426126,"lat":39.921938,"count":25},
+//                {"lng":116.42326,"lat":39.915782,"count":100},
+//                {"lng":116.419239,"lat":39.916759,"count":39},
+//                {"lng":116.417185,"lat":39.929123,"count":11},
+//                {"lng":116.417237,"lat":39.927518,"count":9},
+//                {"lng":116.417784,"lat":39.915754,"count":47},
+//                {"lng":116.420193,"lat":39.917061,"count":52},
+//                {"lng":116.422735,"lat":39.915619,"count":100},
+//                {"lng":116.418495,"lat":39.915958,"count":46},
+//                {"lng":116.416292,"lat":39.931166,"count":9},
+//                {"lng":116.419916,"lat":39.924055,"count":8},
+//                {"lng":116.42189,"lat":39.921308,"count":11},
+//                {"lng":116.413765,"lat":39.929376,"count":3},
+//                {"lng":116.418232,"lat":39.920348,"count":50},
+//                {"lng":116.417554,"lat":39.930511,"count":15},
+//                {"lng":116.418568,"lat":39.918161,"count":23},
+//                {"lng":116.413461,"lat":39.926306,"count":3},
+//                {"lng":116.42232,"lat":39.92161,"count":13},
+//                {"lng":116.4174,"lat":39.928616,"count":6},
+//                {"lng":116.424679,"lat":39.915499,"count":21},
+//                {"lng":116.42171,"lat":39.915738,"count":29},
+//                {"lng":116.417836,"lat":39.916998,"count":99},
+//                {"lng":116.420755,"lat":39.928001,"count":10},
+//                {"lng":116.414077,"lat":39.930655,"count":14},
+//                {"lng":116.426092,"lat":39.922995,"count":16},
+//                {"lng":116.41535,"lat":39.931054,"count":15},
+//                {"lng":116.413022,"lat":39.921895,"count":13},
+//                {"lng":116.415551,"lat":39.913373,"count":17},
+//                {"lng":116.421191,"lat":39.926572,"count":1},
+//                {"lng":116.419612,"lat":39.917119,"count":9},
+//                {"lng":116.418237,"lat":39.921337,"count":54},
+//                {"lng":116.423776,"lat":39.921919,"count":26},
+//                {"lng":116.417694,"lat":39.92536,"count":17},
+//                {"lng":116.415377,"lat":39.914137,"count":19},
+//                {"lng":116.417434,"lat":39.914394,"count":43},
+//                {"lng":116.42588,"lat":39.922622,"count":27},
+//                {"lng":116.418345,"lat":39.919467,"count":8},
+//                {"lng":116.426883,"lat":39.917171,"count":3},
+//                {"lng":116.423877,"lat":39.916659,"count":34},
+//                {"lng":116.415712,"lat":39.915613,"count":14},
+//                {"lng":116.419869,"lat":39.931416,"count":12},
+//                {"lng":116.416956,"lat":39.925377,"count":11},
+//                {"lng":116.42066,"lat":39.925017,"count":38},
+//                {"lng":116.416244,"lat":39.920215,"count":91},
+//                {"lng":116.41929,"lat":39.915908,"count":54},
+//                {"lng":116.422116,"lat":39.919658,"count":21},
+//                {"lng":116.4183,"lat":39.925015,"count":15},
+//                {"lng":116.421969,"lat":39.913527,"count":3},
+//                {"lng":116.422936,"lat":39.921854,"count":24},
+//                {"lng":116.41905,"lat":39.929217,"count":12},
+//                {"lng":116.424579,"lat":39.914987,"count":57},
+//                {"lng":116.42076,"lat":39.915251,"count":70},
+//                {"lng":116.425867,"lat":39.918989,"count":8}];
+
+            if(!isSupportCanvas()){
+                alert('热力图目前只支持有canvas支持的浏览器,您所使用的浏览器不能使用热力图功能~')
+            }
+            //详细的参数,可以查看heatmap.js的文档 https://github.com/pa7/heatmap.js/blob/master/README.md
+            //参数说明如下:
+            /* visible 热力图是否显示,默认为true
+             * opacity 热力的透明度,1-100
+             * radius 势力图的每个点的半径大小
+             * gradient  {JSON} 热力图的渐变区间 . gradient如下所示
+             *	{
+                    .2:'rgb(0, 255, 255)',
+                    .5:'rgb(0, 110, 255)',
+                    .8:'rgb(100, 0, 255)'
+                }
+                其中 key 表示插值的位置, 0~1.
+                    value 为颜色值.
+             */
+            //清除所有标注物
+            busTransformMap.clearOverlays();
+            busTransformMap.addOverlay(heatmapOverlay);
+            heatmapOverlay.setDataSet({data:points,max:points[0].count});
+            //是否显示热力图
+            function openHeatmap(){
+                heatmapOverlay.show();
+            }
+            function closeHeatmap(){
+                heatmapOverlay.hide();
+            }
+            openHeatmap();
+            function setGradient(){
+                /*格式如下所示:
+               {
+                     0:'rgb(102, 255, 0)',
+                     .5:'rgb(255, 170, 0)',
+                     1:'rgb(255, 0, 0)'
+               }*/
+                var gradient = {};
+                var colors = document.querySelectorAll("input[type='color']");
+                colors = [].slice.call(colors,0);
+                colors.forEach(function(ele){
+                    gradient[ele.getAttribute("data-key")] = ele.value;
+                });
+                heatmapOverlay.setOptions({"gradient":gradient});
+            }
+        };
+
+
+        //判断浏览区是否支持canvas
+        function isSupportCanvas(){
+            var elem = document.createElement('canvas');
+            return !!(elem.getContext && elem.getContext('2d'));
+        }
+
+        /*显示热力图结束*/
+
+        /*#######################################*/
+        var compare = function (obj1, obj2) {
+            obj1 = JSON.parse(obj1);
+            obj2 = JSON.parse(obj2);
+            var val1 = obj2.count;
+            var val2 = obj1.count;
+            if (val1 < val2) {
+                return -1;
+            } else if (val1 > val2) {
+                return 1;
+            } else {
+                return 0;
+            }
+        };
+        //请求车辆换乘数据、总数、排名前十开始
+        var requestBusTransferData = function () {
+            var path = basePath+'/redis/getBusTransferData';
+            var param = {'date':new Date().format('yyyyMMdd')};
+            ticc.ajaxRequest(path,param,function (result) {
+                if (result.status){
+                    if (!ticc.isNullOrEmpty(result.data)){
+//                        alert(JSON.stringify(result.data));
+                        if(!ticc.arrayIsNullOrEmpty(result.data.busTransferData)){
+                            heatmapOverlayInit(result.data.busTransferData.sort(compare));
+                        }
+                        $('#busTransferSum').text(result.data.busTransferSum);
+                        displayStationTransferTop10(result.data.stationTransferTop10.sort(compare),result.data.busTransferSum);
+                        displayLineTransferTop10(result.data.lineTransferTop10.sort(compare),result.data.busTransferSum);
+//                        dataMap.put("stationTransferTop10",stationTransferTop10);
+//                        dataMap.put("lineTransferTop10",lineTransferTop10);
+//                        dataMap.put("busTransferSum",busTransferSum);
+//                        dataMap.put("busTransferData",busTransferData);
+                    }else{
+                        ticc.alertInfo(result.msg);
+                    }
+                }else{
+                    ticc.alertError(result.msg);
+                }
+            });
+        };
+        requestBusTransferData();
+        //请求车辆换乘数据、总数、排名前十结束
+
+        /*#######################################*/
+
+        //显示站点换乘量前10开始
+        var displayStationTransferTop10 = function (data,sum) {
+            if (ticc.isNullOrEmpty(data)){
+                return;
+            }
+            //先清空
+            $('#stationTransferTop10').empty();
+            $.each(data,function (index,item) {
+                item = JSON.parse(item);
+                var count = item.count;
+                var percent =((count/sum)*100).toFixed(2);
+                if(!ticc.isNumber(percent)){
+                    percent = 0;
+                }
+
+                var html = '<li>' +
+                    '            <span class="rank-num"><em>'+(index+1)+'</em></span>' +
+                    '            <div class="progress">' +
+                    '                <div class="info">' +
+                    '                <span class="name" title="'+item.stationName+'">'+item.stationName+'</span>' +
+                    '                <span class="name-right">'+count+'次 &nbsp; &nbsp;'+percent+'%</span>' +
+                    '            </div>' +
+                    '            <div class="progress-bar">' +
+                    '                <div class="progress-inner" style="width: '+percent+'%">' +
+                    '                </div>' +
+                    '                </div>' +
+                    '                </div>' +
+                    '                </li>';
+                $('#stationTransferTop10').append(html);
+            });
+        };
+        //显示站点换乘量前10结束
+
+        /*#######################################*/
+
+        //显示线路换乘量前10开始
+        var displayLineTransferTop10 = function (data,sum) {
+            if (ticc.isNullOrEmpty(data)){
+                return;
+            }
+            //先清空
+            $('#lineTransferTop10').empty();
+            $.each(data,function (index,item) {
+                item = JSON.parse(item);
+                var count = item.count;
+                var percent = ((count / sum) * 100).toFixed(2);
+                if (!ticc.isNumber(percent)) {
+                    percent = 0;
+                }
+
+                var html = '<li>' +
+                    '            <span class="rank-num"><em>' + (index + 1) + '</em></span>' +
+                    '            <div class="progress">' +
+                    '                <div class="info">' +
+                    '                <span class="name" title="' + item.lineName + '">' + item.lineName + '</span>' +
+                    '                <span class="name-right">' + count + '次 &nbsp; &nbsp;' + percent + '%</span>' +
+                    '            </div>' +
+                    '            <div class="progress-bar">' +
+                    '                <div class="progress-inner" style="width: ' + percent + '%">' +
+                    '                </div>' +
+                    '                </div>' +
+                    '                </div>' +
+                    '                </li>';
+                $('#lineTransferTop10').append(html);
+            });
+        };
+        //显示线路换乘量前10结束
+
+        /*#######################################*/
+
+        //定时请求车辆换乘数据、总数、排名前十----15分钟
+        setInterval(function () {
+            requestBusTransferData();
+        },1000*60*15);
+
+        /*##############################################*/
+
+        var ac;
+        /*站点搜索框开始*/
+        var myValue;
+        var stationSearch = function () {
+            ac = new BMap.Autocomplete(    //建立一个自动完成的对象
+                {
+                    "input" : "searchInput"//输入框id
+                    ,"location" : "广州市"//设定返回结果的所属范围
+//                ,"location" : lineGotoAreaMap//设定返回结果的所属范围
+                });
+            ac.addEventListener("onconfirm", function(e) {    //鼠标点击下拉列表后的事件
+                var _value = e.item.value;
+                myValue = _value.province +  _value.city +  _value.district +  _value.street +  _value.business;
+                console.log(myValue);
+                setPlace();
+            });
+        };
+        function setPlace(){
+//            lineGotoAreaMap.clearOverlays();    //清除地图上所有覆盖物
+            function myFun(){
+//                ac.dispose();
+                var pp = local.getResults().getPoi(0).point;    //获取第一个智能搜索的结果
+                busTransformMap.centerAndZoom(pp, 20);
+//                lineGotoAreaMap.addOverlay(new BMap.Marker(pp));    //添加标注
+//                requestBaiDuPoint(pp);
+            }
+            var local = new BMap.LocalSearch(busTransformMap, { //智能搜索
+                onSearchComplete: myFun
+            });
+            local.search(myValue);
+        }
+        stationSearch();
+        /*站点搜索框结束*/
+
+
+        /*#######################################*/
+    });
+
+</script>
+</html>

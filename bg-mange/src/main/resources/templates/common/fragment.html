@@ -1,0 +1,6 @@
+<script th:fragment="commonVar" type="text/javascript" th:inline="javascript" xmlns:th="http://www.thymeleaf.org">
+//    var basePath = /*[[@{/}]]*/;
+    var basePath = /*[[@{/}]]*/;
+    //去掉后面的斜线
+    basePath = basePath.substring(0,basePath.length-1);
+</script>

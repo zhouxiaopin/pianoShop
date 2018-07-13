@@ -1,0 +1,18 @@
+<div xmlns:th="http://www.thymeleaf.org" th:fragment="center">
+    <div id="mainTabs" class="easyui-tabs" data-options="border:false" style="width:100%;height:100%;">
+        <div title="我的桌面" th:include="myDesktop :: myDesktop">
+        </div>
+    </div>
+    <!--通用对话框-->
+    <div class="dialog" data-options="width: '50%',height: '70%',closed: false,cache: false,
+                resizable:true,method:'POST',maximizable:true,modal: true,
+                        onBeforeClose:function () {
+                            $(this).panel('restore');
+                            $(this).panel('resize',{
+                                width: '50%',
+                                height: '70%',
+                            });
+                        }">
+
+    </div>
+</div>

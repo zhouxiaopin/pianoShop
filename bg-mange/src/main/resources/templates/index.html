@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="common/commonHead :: common_header(~{::title},~{})">
+  <title>公交运行分析系统</title>
+</head>
+<body id="container" class="easyui-layout" >
+<!--顶部-->
+<div data-options="region:'north'" style="height:70px;" th:include="common/top :: top">
+</div>
+<!--左边-->
+<div data-options="region:'west',title:'主菜单',split:true" style="width:200px;" th:include="common/left :: left">
+</div>
+<!--中间-->
+<div data-options="region:'center'" style="width:100%; overflow: hidden;" th:include="common/center :: center">
+</div>
+<!--底部-->
+<!--<div data-options="region:'south'">-->
+<!--</div>-->
+<script type="text/javascript">
+    $(function(){
+        // todo 发布去掉注释
+        //查询报警记录
+//        var queryAlarmInter = setInterval(function () {
+//            var path = '${pageContext.request.contextPath}/alarmRecord/list.action';
+//            //处理状态(00未处理，01已处理)
+//            var param = {'alarmRecordCustom.processStatus':'00'};
+//            ticc.ajaxRequest(path,param,function (data) {
+//                if (data.total >= 1){
+//                    //提示
+////                    alert(JSON.stringify(data.rows));
+//
+//                    var msg = '一共有<span style="color: #FF0000">'+data.total+'</span>条报警记录未处理';
+//                    msg += '<br><a href="javascript:gotoAlarmRecordPage()">请点击处理报警记录</a>';
+//                    $.messager.show({
+//                        title:'报警记录',
+//                        width: 200,
+//                        height: 150,
+//                        msg: msg,
+//                        timeout:4000,
+//                        showType:'slide'
+//
+//                    });
+//
+//                }
+//            });
+//
+//        },6000);
+    });
+</script>
+</body>
+</html>
+

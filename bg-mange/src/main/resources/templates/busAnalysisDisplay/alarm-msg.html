@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+     <meta name="viewport" content="width=device-width,height=device-height, minimum-scale=1.0, maximum-scale=1.0">
+    <!--<meta name="viewport" content="initial-scale=1.0, user-scalable=no" />-->
+    <title>报警信息</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/static/busAnalysisDisplay/css/style.css}" />
+    <link rel="stylesheet" th:href="@{/static/jeasyui/themes/cyan/easyui.css}" type="text/css"/>
+    <link rel="stylesheet" th:href="@{/static/jeasyui/themes/color.css}" type="text/css" />
+    <link rel="stylesheet" th:href="@{/static/jeasyui/themes/icon.css}" type="text/css" />
+    <script  th:src="@{/static/busAnalysisDisplay/js/jquery-1.11.1.min.js}"></script>
+    <script type="text/javascript">
+        (function(){
+            function sizeHtml(){
+                window.mtSizeBase = $(window).width()/32;
+                //window.mtSizeBase = window.mtSizeBase>45?45:window.mtSizeBase;
+                $("html").css("font-size",window.mtSizeBase+"px");
+            }
+            sizeHtml();
+            $(window).resize(function(){
+                setTimeout(function(){
+                    sizeHtml();
+                },300);
+            });
+        })();
+    </script>
+</head>
+<body class="common-bg" style="overflow:hidden;">
+    <h3 class="head-img"></h3>
+    <div class="content-body">
+        <div class="nav-crosswise">
+            <div class="nav-crosswise-main c-fff"><span>当前位置</span>><span>地图展示</span>><span>报警信息</span></div>
+        </div>
+        <div class="main-area clearfix">
+            <div class="lengthways-nav fl" id="side-menu">
+                <div class="map-show-nav selected">
+                    <ul>
+                        <li class="active">
+                            <span class="J_menuItem"><img th:src="@{/static/busAnalysisDisplay/images/quan.png}">地图展示</span>
+                            <ul>
+                                <li><a href="traffic-monitoring.html" th:href="@{/page/passengerFlowMonitor}">客流监控</a></li>
+                                <li><a href="car-monitoring.html" th:href="@{/page/busMonitor}">车辆监控</a></li>
+                                <li><a href="car-transfer.html" th:href="@{/page/busTransform}">车辆换乘</a></li>
+                                <li><a href="od-fenbu.html" th:href="@{/page/regionODDistri}">区域OD分布</a></li>
+                                <li><a href="javascript:;" class="on">报警信息</a></li>
+                            </ul>
+                        </li>
+                        <li >
+                            <span class="J_menuItem"><img th:src="@{/static/busAnalysisDisplay/images/quan.png}">数据分析</span>
+                            <ul>
+                                <li>
+                                    <span class="J_menuItem">公交客运</span>
+                                    <ul>
+                                        <li><a href="passenger-form.html" th:href="@{/page/passenVolumeCons}">客运量构成</a></li>
+                                        <li><a href="brush-card-number.html" th:href="@{/page/swingCardVolumeStati}">刷卡量统计</a></li>
+                                    </ul>
+                                </li>
+                                <li>
+                                    <span class="J_menuItem">公交运行</span>
+                                    <ul>
+                                        <li><a href="gaofeng-chart.html" th:href="@{/page/peakRun}">高峰运行图</a></li>
+                                        <li><a href="running-speed-chart.html" th:href="@{/page/runSpeedStati}">运行速度统计</a></li>
+                                        <li><a href="traffic-zhishu.html" th:href="@{/page/trafficNum}">交通指数</a></li>
+                                        <li><a href="traffic-routes.html" th:href="@{/page/congestionRoad}">拥堵路段</a></li>
+                                    </ul>
+                                </li>
+                                <li>
+                                    <span class="J_menuItem">换乘分析</span>
+                                    <ul>
+                                        <li><a href="transfer-form.html" th:href="@{/page/transChangeCons}">换乘量构成</a></li>
+                                        <li><a href="transfer-tongji.html" th:href="@{/page/transChangeStati}">换乘量统计</a></li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+
+            </div>
+            <div class="map-area fr " id="content">
+
+                <!--#######################################-->
+
+                <!--地图开始-->
+                <div id="alarmMsgMap" class="mapStyle">
+                </div>
+                <!--地图结束-->
+                <!--<img th:src="@{/static/busAnalysisDisplay/images/map.jpg}" alt="" />-->
+
+
+                <!-- 警报信息 -->
+                <div class="alarm-pup">
+                    <div class="clearfix alarm-pup-title"><span class="fl">报警信息</span><span id="stationWarnInfoSum" class="fr">0条</span></div>
+                    <ul id="stationWarnInfo" class="alarm-msg-list">
+                        <!--<li class="clearfix"><span class="alarm-time">11:10</span><span class="alarm-station" title="番禺市桥站市桥站">市桥站市桥站</span><span class="alarm-details">30分钟没有车辆经过！</span></li>-->
+                        <!--<li class="clearfix"><span class="alarm-time">11:10</span><span class="alarm-station" title="大学城南站">大学城南站</span><span class="alarm-details">30分钟没有车辆经过！</span></li>-->
+                        <!--<li class="clearfix"><span class="alarm-time">11:10</span><span class="alarm-station" title="市桥站">市桥站</span><span class="alarm-details">30分钟没有车辆经过！</span></li>-->
+                        <!--<li class="clearfix"><span class="alarm-time">11:10</span><span class="alarm-station" title="市桥站">市桥站</span><span class="alarm-details"><em>60分钟</em>没有车辆经过！</span></li>-->
+                        <!--<li class="clearfix"><span class="alarm-time">11:10</span><span class="alarm-station" title="大学城南站">大学城南站</span><span class="alarm-details">30分钟没有车辆经过！</span></li>-->
+                        <!--<li class="clearfix"><span class="alarm-time">11:10</span><span class="alarm-station" title="市桥站">市桥站</span><span class="alarm-details">30分钟没有车辆经过！</span></li>-->
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+<script type="text/javascript" th:replace="common/fragment :: commonVar"></script>
+<script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=fdv5gclnF2HSnNyKm4Dj3aVuLUGMLUZ1" ></script>
+<script type="text/javascript" src="http://api.map.baidu.com/library/InfoBox/1.2/src/InfoBox_min.js" ></script>
+<!--<script type="text/javascript" src="http://api.map.baidu.com/library/TextIconOverlay/1.2/src/TextIconOverlay_min.js" ></script>-->
+<!--<script type="text/javascript" src="http://api.map.baidu.com/library/MarkerClusterer/1.2/src/MarkerClusterer_min.js"></script>-->
+<!--<script type="text/javascript" src="http://api.map.baidu.com/library/DistanceTool/1.2/src/DistanceTool_min.js"></script>-->
+<script th:src="@{/static/js/baiduMap/TextIconOverlay_min.js}"></script>
+<script th:src="@{/static/js/baiduMap/MarkerClusterer_min.js}"></script>
+<script th:src="@{/static/busAnalysisDisplay/js/baiduMapStyle.js}"></script>
+<script th:src="@{/static/jeasyui/jquery.easyui.min.js}"></script>
+<script th:src="@{/static/jeasyui/locale/easyui-lang-zh_CN.js}"></script>
+<script th:src="@{/static/js/baiduMapCommon.js}"></script>
+<script th:src="@{/static/js/ticcCommon.js}"></script>
+<script type="text/javascript">
+
+    //下面是页面的
+    $(function(){
+        var body = (document.compatMode && document.compatMode.toLowerCase() == "css1compat") ? document.documentElement : document.body;
+
+        function ResizeTable() {
+            var sideWidth = document.getElementById("side-menu");
+            var con = document.getElementById('content');
+
+            sideWidth.style.height = '' + Math.max((body.clientHeight - 100), 0) + "px";
+            con.style.height = '' + Math.max((body.clientHeight - 100), 0) + "px";
+            con.style.width = '' + Math.max((body.clientWidth - 180), 0) + "px";
+
+
+
+        }
+        ResizeTable();
+
+        $(window).resize(function () {
+            ResizeTable()
+        });
+
+        var $item = $(".J_menuItem");
+        $item.on("click",function(){
+            var $this = $(this);
+            $this.siblings("ul").slideToggle(300);
+            $this.parent("li").siblings("li").find("ul").slideUp(300);
+            $this.parent("li").addClass("active").siblings("li").removeClass("active");
+        })
+
+
+        $(".top-ul li").click(function() {
+            var index = $(this).index();
+            $(this).addClass('active').siblings('li').removeClass('active');
+            $(this).parent().siblings('ul').children().hide();
+            $(this).parent().siblings('ul').children().eq(index).show();
+        });
+
+        $(".map-show-ways li").click(function() {
+            $(this).addClass('current').siblings().removeClass('current');
+        });
+
+
+    });
+
+
+    $(function () {
+        // 获取Map实例
+        var alarmMsgMap = baiduMapUtil.getDisplayMap("alarmMsgMap");
+        alarmMsgMap.setMapStyle({styleJson:baiduMapStyle});
+//        //加上下面那句才不报错
+        alarmMsgMap.centerAndZoom(new BMap.Point(113.3405,23.137428), 14);
+
+
+
+
+
+
+
+
+
+        //百度地图API功能
+        //加载第二张地图
+//        alarmMsgMap.addControl(new BMap.MapTypeControl({mapTypes: [BMAP_NORMAL_MAP,BMAP_SATELLITE_MAP ]}));//添加地图类型控件
+        alarmMsgMap.addControl(new BMap.OverviewMapControl());
+//        alarmMsgMap.enableScrollWheelZoom(true);
+//        var myDis = new BMapLib.DistanceTool(alarmMsgMap);
+//        window.onload = function() {
+//            displayBoundary();
+//        };
+        function displayBoundary() {
+            var cities = [
+                {color : "rgba(254,169,1,0.8)",name : "广州市"}
+            ];
+//            var cities = [
+//                {color : "#ff0000",name : "越秀区"},
+//                {color : "#ff0000",name : "荔湾区"},
+//                {color : "#ff0000",name : "天河区"},
+//                {color : "#ff0000",name : "海珠区"},
+//                {color : "#ff0000",name : "白云区"},
+//                {color : "#ff0000",name : "黄埔区"},
+//                {color : "#ff0000",name : "花都区"},
+//                {color : "#ff0000",name : "罗岗区"},
+//                {color : "#ff0000",name : "南沙区"},
+//                {color : "#ff0000",name : "番禺区"},
+//                {color : "#ff0000",name : "增城区"},
+//                {color : "#ff0000",name : "从化区"}
+//            ];
+            var json;
+            for (var j = 0; j < cities.length; j++) {
+                json = cities[j]; //城市的集合
+                getBoundary(json);
+            }
+        }
+        function getBoundary(json) {
+            var _Boundary = new BMap.Boundary();
+            _Boundary.get(json.name, function(rs) { //获取行政区域
+                var count = rs.boundaries.length; //行政区域的点有多少个
+                for (var i = 0; i < count; i++) {
+                    var ply = new BMap.Polygon(rs.boundaries[0], {
+                        strokeWeight : 2,
+                        strokeOpacity : 1,
+                        strokeColor : json.color,
+                        fillColor : json.color, //控制覆盖物的颜色
+                        fillOpacity : 0.000001   //控制覆盖物的透明度
+                    }); //建立多边形覆盖物
+                    alarmMsgMap.addOverlay(ply); //添加覆盖物
+                }
+            });
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+        /*#######################################*/
+
+        /*显示站点开始*/
+        var markerClusterer;
+        var displayStation = function (data) {
+            var baiduPoints =[];
+//            alert(JSON.stringify(data));
+            $.each(data,function (index,item) {
+                baiduPoints.push(new BMap.Point(item.longitudeBd, item.latitudeBd));
+            });
+//            var baiduPoints = [
+//                new BMap.Point(113.45667305396,23.398978084108),
+//                new BMap.Point(113.4765825928,23.421942833634),
+//                new BMap.Point(113.49320089908,23.410611758707),
+//                new BMap.Point(113.49421220801,23.403646707442),
+//                new BMap.Point(113.49793990841,23.393105408397)
+//            ];
+
+
+//            var MAX = 15000;
+//            var pt = null;
+//            var i = 0;
+//            for (; i < MAX; i++) {
+//                pt = new BMap.Point(Math.random() * 40 + 85, Math.random() * 30 + 21);
+//                baiduPoints.push(pt);
+//            }
+
+
+//            var labels = [];
+//            var labelOptions = [];
+            var posIcon = new BMap.Icon(
+                basePath+'/static/busAnalysisDisplay/images/station_warn.png',
+//                '/busAnalysisSys/static/busAnalysisDisplay/images/station_normal.png',
+                new BMap.Size(20,40)
+            );
+            var markerOptions = {icon:posIcon,rotation:0};
+//            $.each(data,function (index,item) {
+////                alert(JSON.stringify(item));
+////                var item = JSON.parse(item);
+//                var point = new BMap.Point(item.bdLng,item.bdLat);
+//                baiduPoints.push(point);
+//                labels.push(item.equipNo);
+//                markerOptions.push({icon:posIcon,rotation:0});
+//                labelOptions.push({offset:new BMap.Size(35,-30),position:point});
+//
+//            });
+//            $.each(baiduPoints,function (index,item) {
+//                markerOptions.push({icon:posIcon,rotation:0});
+//            });
+            console.log('坐标个数：'+baiduPoints.length);
+            if (!ticc.isNull(markerClusterer)){
+                markerClusterer.clearMarkers();
+            }
+//            baiduMapUtil.addMarker(baiduPoints,markerOptions);
+            //最简单的用法，生成一个marker数组，然后调用markerClusterer类即可。
+//            var markerClusterer = new BMapLib.MarkerClusterer(alarmMsgMap, {markers:markers});
+
+//            markerClusterer = baiduMapUtil.addMarkerClusterer(baiduPoints,markerOptions,'click',function (marker) {
+            markerClusterer = baiduMapUtil.addMarkerClusterer(baiduPoints,markerOptions,'click',function (marker) {
+                displayInfoBox(marker.data);
+//                var d = marker.data;
+//
+//                var posi = marker.getPosition();
+//                var htmlContent = "设备编号:<strong>"+d.equipNo+"</strong>";
+//                baiduMapUtil.openInfoWindow(htmlContent,posi);
+            },null,null,null,data);
+        };
+        /*显示站点结束*/
+
+        /*#######################################*/
+
+        /*请求全部报警信息开始*/
+        var stationLineCustoms;
+        var requestAllStationWarnInfo = function () {
+            var path = basePath+'/redis/getStationWarnInfo';
+            var param = null;
+            ticc.ajaxRequest(path,param,function (result) {
+                if(result.status){
+                    if (!ticc.isNullOrEmpty(result.data)){
+                        displayStationWarnInfo(result.data.stationWarns);
+                        stationLineCustoms = result.data.stationLineCustoms;
+                        displayStation(stationLineCustoms);
+                    }else{
+                        ticc.alertInfo(result.msg);
+                    }
+                }else{
+                    ticc.alertError(result.msg);
+                }
+            });
+
+        };
+        requestAllStationWarnInfo();
+        /*请求全部报警信息结束*/
+
+        /*#######################################*/
+        /*展示报警信息开始*/
+        var displayStationWarnInfo = function (data) {
+            $('#stationWarnInfoSum').text(data.length+'条');
+            $('#stationWarnInfo').empty();
+            $.each(data,function (index,item) {
+                var date = item.warnTime.split(' ')[1].substring(0,5);
+                var html = '<li class="clearfix"><input id="busStopCode" type="hidden" value="'+item.siteCode+'" /><span class="alarm-time">'+date+'</span>' +
+                    '<span class="alarm-station" title="'+item.siteName+'">'+item.siteName+'</span><span class="alarm-details">';
+                switch (item.level){
+                    case '1':
+                        html += '<em>60分钟级以上</em>没有车辆经过！</span></li>';
+                        break;
+                    case '2':
+                        html += '45-60分钟没有车辆经过！</span></li>';
+                        break;
+                    case '3':
+                        html += '30-45分钟没有车辆经过！</span></li>';
+                        break;
+                    default:
+                        html += '没有车辆经过！</span></li>';
+                        break;
+                }
+                $('#stationWarnInfo').append(html);
+            });
+        };
+        /*展示报警信息结束*/
+
+        /*#######################################*/
+        //报警信息点击事件
+        $(document).on("click",".alarm-msg-list li", function() {
+            try {
+                var busStopCode = $(this).find('#busStopCode').val();
+                console.log('站点编码：'+busStopCode);
+                $.each(stationLineCustoms,function (index,item) {
+                    if (busStopCode == item.busStopCode){
+                        console.log('站点记录：'+JSON.stringify(item));
+                        var stationLineCustom = item;
+                        var posi = new BMap.Point(stationLineCustom.longitudeBd, stationLineCustom.latitudeBd);
+                        alarmMsgMap.centerAndZoom(posi, 19);
+                        displayInfoBox(stationLineCustom);
+                        return false;
+                    }
+                });
+
+
+//                var stationLineCustom = stationLineCustoms[$(this).index()];
+//                alert(JSON.stringify(stationLineCustoms[206]))
+//                console.log($(this).index());
+//                console.log(JSON.stringify(stationLineCustom));
+//                var posi = new BMap.Point(stationLineCustom.longitudeBd, stationLineCustom.latitudeBd);
+//                alarmMsgMap.centerAndZoom(posi, 19);
+//                displayInfoBox(stationLineCustom);
+            }catch (e){
+                console.log(e)
+            }
+        });
+        /*#######################################*/
+
+        //显示自定义信息窗体开始
+        var infoBox;
+        var displayInfoBox = function (data) {
+            var markerData = data;
+            var html = '<div class="online-car-msg">';
+            html += '<div>站点名：'+markerData.busStopName+'</div>';
+            html += '<em></em></div>';
+
+
+            //如果infoBox不为空要关闭
+            if (!ticc.isNull(infoBox)){
+                infoBox.close();
+                infoBox = null;
+            }
+            infoBox = baiduMapUtil.createInfoBox(html,new BMap.Size(0, 20));
+//                infoBox.open(marker.getPosition());
+//            infoBox.open(marker);
+//                        var baiduPoint = $.mapUtils.gps84_To_bd09(markerData.lng,markerData.lat);
+//                        var posi = new BMap.Point(baiduPoint[0], baiduPoint[1]);
+            var posi = new BMap.Point(markerData.longitudeBd,markerData.latitudeBd);
+            infoBox.open(posi);
+            //防止默认的关闭按钮图片404
+            $('div.infoBox>img').prop('src','').css('display','none');
+//                $('div.infoBox>img').css('display','none');
+            $('div.online-car-msg>em').on("click",function () {
+                infoBox.close();
+            })
+
+        };
+        //显示自定义信息窗体结束
+
+        /*#######################################*/
+
+        /*定时请求报警信息 --- 每30分钟*/
+        setInterval(function () {
+            requestAllStationWarnInfo();
+        },1000*60*30);
+
+
+    });
+
+
+
+</script>
+</html>

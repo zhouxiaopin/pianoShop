@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="common/commonHead :: common_header(~{::title},~{})">
+    <title>系统用户</title>
+</head>
+<body>
+<div th:switch="${oprt}" style="width:100%;height: 100%;">
+    <div th:case="'query'" th:include="frame/adminQuery :: adminQuery" style="width:100%;height: 100%;">
+    </div>
+
+    <div th:case="*">
+        <form id="adminForm" method="post" >
+            <table style="margin: 0 auto;">
+                <tbody>
+                <td colspan="2">
+                    <label id="retMsg" style="display:block;text-align: center;color: #FF0000" th:inline="text">[[${retMsg}]]</label>
+                    <input name="id" th:value="${obj.id}" type="hidden"/>
+                </td>
+                <div th:switch="${oprt}">
+                    <div th:case="'add'">
+                        <tr>
+                            <th><label >管理员的姓名:</label></th>
+                            <td><input name="adminName" th:value="${obj.adminName}" class="easyui-textbox easyui-validatebox" missingMessage="管理员的姓名不能为空" data-options="required:true"/></td>
+                        </tr>
+                        <tr>
+                            <th><label >管理员的账号:</label></th>
+                            <td><input name="account" th:value="${obj.account}" class="easyui-textbox easyui-validatebox" missingMessage="管理员的账号不能为空" data-options="required:true"/></td>
+                        </tr>
+                        <tr>
+                            <th><label >管理员的密码:</label></th>
+                            <td><input name="password" th:value="${obj.password}" class="easyui-textbox easyui-validatebox" missingMessage="管理员的密码不能为空" data-options="required:true"/></td>
+                        </tr>
+                    </div>
+                    <div th:case="'update'">
+                        <tr>
+                            <th><label >管理员的姓名:</label></th>
+                            <td><input name="adminName" th:value="${obj.adminName}" class="easyui-textbox easyui-validatebox" missingMessage="管理员的姓名不能为空" data-options="required:true"/></td>
+                        </tr>
+                        <tr>
+                            <th><label >管理员的账号:</label></th>
+                            <td><input name="account" th:value="${obj.account}" class="easyui-textbox easyui-validatebox" missingMessage="管理员的账号不能为空" data-options="required:true"/></td>
+                        </tr>
+                        <tr>
+                            <th><label >管理员的密码:</label></th>
+                            <td><input name="password" th:value="${obj.password}" class="easyui-textbox easyui-validatebox" missingMessage="管理员的密码不能为空" data-options="required:true"/></td>
+                        </tr>
+                        <tr>
+                            <th><label >记录状态:</label></th>
+                            <td>
+                                <select name="useStatus" class="easyui-combobox" style="width:170px;">
+                                    <option th:value="00" th:selected="${obj.useStatus == '00'}">禁用</option>
+                                    <option th:value="01" th:selected="${obj.useStatus == '01'}">可用</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th><label >创建时间:</label></th>
+                            <td><input name="useStatus" th:value="${#dates.format(obj.createTime, 'yyyy-MM-dd HH:mm:ss')}" class="easyui-datetimebox" type="text" disabled="disabled"/></td>
+                        </tr>
+                    </div>
+                    <div th:case="'queryDetail'">
+                        <tr>
+                            <th><label >管理员的姓名:</label></th>
+                            <td><input name="adminName" th:value="${obj.adminName}" class="easyui-textbox easyui-validatebox" type="text"/></td>
+                        </tr>
+                        <tr>
+                            <th><label >管理员的账号:</label></th>
+                            <td><input name="account" th:value="${obj.account}" class="easyui-textbox easyui-validatebox" type="text"/></td>
+                        </tr>
+                        <tr>
+                            <th><label >管理员的密码:</label></th>
+                            <td><input name="password" th:value="${obj.password}" class="easyui-textbox easyui-validatebox" type="text"/></td>
+                        </tr>
+                        <tr>
+                            <th><label >记录状态:</label></th>
+                            <td>
+                                <select name="useStatus" class="easyui-combobox" style="width:170px;">
+                                    <option th:value="00" th:selected="${obj.useStatus == '00'}">禁用</option>
+                                    <option th:value="01" th:selected="${obj.useStatus == '01'}">可用</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th><label >创建时间:</label></th>
+                            <td><input name="createTime" th:value="${#dates.format(obj.createTime, 'yyyy-MM-dd HH:mm:ss')}" class="easyui-datetimebox" type="text"/></td>
+                        </tr>
+                    </div>
+                    <div th:case="'setRole'">
+                        <tr>
+                            <th><label >管理员的姓名:</label></th>
+                            <td><input name="adminName" th:value="${obj.adminName}" class="easyui-textbox easyui-validatebox" disabled="disabled"/></td>
+                        </tr>
+                        <tr>
+                            <th><label >所属角色:</label></th>
+                            <td>
+                                <ul id="roles" style="height: 100%;width: 100%;"></ul>
+                                <input name="roleNos" value="" type="hidden"/>
+                            </td>
+                        </tr>
+                    </div>
+                </div>
+                <tr>
+                    <td colspan="2" style="text-align: center;padding-top: 5px">
+                        <a id="submitForm" class="easyui-linkbutton" data-options="iconCls:'icon-ok'">确定</a>
+                        <a id="resetForm" class="easyui-linkbutton" data-options="iconCls:'icon-undo'">重置</a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </form>
+        <script type="text/javascript" th:replace="common/fragment :: commonVar"></script>
+        <script type="text/javascript" th:inline="javascript">
+            $(function () {
+                var oprt = [[${oprt }]];
+                if(oprt == "queryDetail"){
+                    $("#adminForm").find(":input").attr("disabled",true);
+                    $("#adminForm").find("a").attr("disabled",true);
+                }
+
+                if(oprt == "setRole"){
+                    //角色树
+                    $('#roles').tree({
+                        url:basePath+'/sysRole/getTree',
+                        checkbox: true,
+                        animate: true,
+                        lines: true,
+                        onBeforeExpand: function (node) {
+
+                        },
+                        onBeforeCheck: function (node, checked) {
+                        },
+                        onCheck: function(node,checked) {
+                        },
+                        onLoadSuccess: function(node,data) {
+                            var jsonObj = [[${jsonObj }]];
+                            var trees = JSON.parse(jsonObj).adminRoles;
+                            for (var i = 0, len = trees.length; i < len; i++){
+                                var node = $('#roles').tree('find', trees[i].roleNo);
+//                                node.checked = 'checked';
+                                $('#roles').tree('check',node.target);
+                            }
+
+                        }
+                    });
+                }
+
+                $('#adminForm').form({
+                    url:basePath+'/admin/'+oprt,
+                    onSubmit: function(param){
+                        //获取选中的角色
+                        if(oprt == "setRole"){
+
+                            var nodes =  $('#roles').tree('getChecked');
+                            var roleNos = [];
+                            for (var i = 0, len = nodes.length; i < len; i++){
+                                roleNos.push(nodes[i].id);
+                            }
+
+                            $('input[name=roleNos]').val(roleNos);
+                        }
+                        var isValid = $(this).form('validate');
+                        if (!isValid){
+                            $('#retMsg').html("表单校验不通过");
+                        }
+                        return isValid;	// 返回false终止表单提交
+                    },
+                    success:function(data){
+                        data = JSON.parse(data);
+                        $('#retMsg').html(data.msg);
+                    }
+                });
+                $('#submitForm').on('click',function () {
+                    if ($(this).linkbutton('options').disabled == false) {
+                        $('#adminForm').form('submit');
+                    }
+                });
+                $('#resetForm').on('click',function () {
+                    if ($(this).linkbutton('options').disabled == false) {
+                        $('#adminForm').form('reset');
+                    }
+                });
+
+            });
+
+        </script>
+    </div>
+</div>
+
+</body>
+</html>

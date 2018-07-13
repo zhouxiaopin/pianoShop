@@ -1,0 +1,104 @@
+<div xmlns:th="http://www.thymeleaf.org" th:fragment="myDesktop">
+    <style type="text/css">
+        .mainPageDiv{
+            width: 100%;
+            height: auto;
+            text-align: center;
+        }
+        .mainPageDiv header{
+            margin: 40px 0px;
+
+        }
+        .mainPageDiv img{
+            width: 60px;
+            height: 60px;
+            /*   display:inline-block;
+               vertical-align:middle;*/
+        }
+        .mainPageDiv b{
+            margin-left: 8px;
+            font-size: 34px;
+            color: #3d565d;
+            display:inline-block;
+            vertical-align:middle;
+        }
+        .mainPageDiv ul{
+            display: block;
+            list-style: none;
+            background-color: #FF0000;
+            width: 800px;
+            margin: 0 auto;
+        }
+        .mainPageDiv ul li{
+            float: left;
+            display: block;
+            list-style: none;
+            background-color: #607377;
+            width: 25%;
+            height: 200px;
+        }
+        .mainPageDiv ul li:nth-of-type(1){
+            filter: alpha(Opacity=80);
+            -moz-opacity: 0.5;
+            opacity: 0.5;
+        }
+        .mainPageDiv ul li:nth-of-type(2){
+            filter: alpha(Opacity=80);
+            -moz-opacity: 0.7;
+            opacity: 0.7;
+        }
+        .mainPageDiv ul li:nth-of-type(3){
+            filter: alpha(Opacity=80);
+            -moz-opacity: 0.9;
+            opacity: 0.9;
+        }
+        .mainPageDiv ul li p:hover{
+            cursor: pointer;
+        }
+        .mainPageDiv ul li p img{
+            margin-top: 40px;
+            margin-bottom: 20px;
+            margin-right: auto;
+            margin-left: auto;
+            width: 60px;
+            height: 60px;
+            display: block;
+        }
+        .mainPageDiv ul li p span{
+            font-size: 20px;
+            color: #FFFFFF;
+        }
+    </style>
+    <div class="mainPageDiv">
+        <header>
+            <img th:src="@{/static/images/mainpage/middle_logo.png}">
+            <b>公交运行分析系统</b>
+        </header>
+        <ul>
+            <li>
+                <p>
+                    <img th:src="@{/static/images/mainpage/base_data_icon.png}">
+                    <span>基础数据</span>
+                </p>
+            </li>
+            <li>
+                <p>
+                    <img th:src="@{/static/images/mainpage/data_analysis_icon.png}">
+                    <span>数据分析</span>
+                </p>
+            </li>
+            <li>
+                <p>
+                    <img th:src="@{/static/images/mainpage/bus_info_icon.png}">
+                    <span>车辆信息</span>
+                </p>
+            </li>
+            <li>
+                <p>
+                    <img th:src="@{/static/images/mainpage/dianziweilan_icon.png}">
+                    <span>电子围栏</span>
+                </p>
+            </li>
+        </ul>
+    </div>
+</div>

@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,height=device-height, minimum-scale=1.0, maximum-scale=1.0">
+    <title>客运量构成</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/static/busAnalysisDisplay/css/style.css}" />
+    <link rel="stylesheet" th:href="@{/static/jeasyui/themes/cyan/easyui.css}" type="text/css"/>
+    <link rel="stylesheet" th:href="@{/static/jeasyui/themes/color.css}" type="text/css" />
+    <link rel="stylesheet" th:href="@{/static/jeasyui/themes/icon.css}" type="text/css" />
+    <script  th:src="@{/static/busAnalysisDisplay/js/jquery-1.11.1.min.js}"></script>
+    <script type="text/javascript">
+        (function(){
+            function sizeHtml(){
+                window.mtSizeBase = $(window).width()/32;
+                //window.mtSizeBase = window.mtSizeBase>45?45:window.mtSizeBase;
+                $("html").css("font-size",window.mtSizeBase+"px");
+            }
+            sizeHtml();
+            $(window).resize(function(){
+                setTimeout(function(){
+                    sizeHtml();
+                },300);
+            });
+        })();
+
+    </script>
+</head>
+<body class="common-bg" style="overflow:hidden;">
+    <h3 class="head-img"></h3> 
+    <div class="content-body">
+        <div class="nav-crosswise">
+            <div class="nav-crosswise-main c-fff"><span>当前位置</span>><span>数据分析</span>><span>公交客运</span>><span>客运量构成</span></div>
+        </div>
+        <div class="main-area clearfix">
+            <div class="lengthways-nav fl" id="side-menu">
+                <div class="map-show-nav selected">
+                    <ul>
+                        <li>
+                            <span class="J_menuItem"><img th:src="@{/static/busAnalysisDisplay/images/quan.png}">地图展示</span>
+                            <ul>
+                                <li><a href="traffic-monitoring.html" th:href="@{/page/passengerFlowMonitor}">客流监控</a></li>
+                                <li><a href="car-monitoring.html" th:href="@{/page/busMonitor}">车辆监控</a></li>
+                                <li><a href="car-transfer.html" th:href="@{/page/busTransform}">车辆换乘</a></li>
+                                <li><a href="od-fenbu.html" th:href="@{/page/regionODDistri}">区域OD分布</a></li>
+                                <li><a href="alarm-msg.html" th:href="@{/page/alarmMsg}">报警信息</a></li>
+                            </ul>
+                        </li>
+                        <li  class="active">
+                            <span class="J_menuItem"><img th:src="@{/static/busAnalysisDisplay/images/quan.png}">数据分析</span>
+                            <ul>
+                                <li class="active">
+                                    <span class="J_menuItem">公交客运</span>
+                                    <ul>
+                                        <li><a class="on">客运量构成</a></li>
+                                        <li><a href="brush-card-number.html" th:href="@{/page/swingCardVolumeStati}">刷卡量统计</a></li>
+                                    </ul>
+                                </li>
+                                <li>
+                                    <span class="J_menuItem">公交运行</span>
+                                    <ul>
+                                        <li><a href="gaofeng-chart.html" th:href="@{/page/peakRun}">高峰运行图</a></li>
+                                        <li><a href="running-speed-chart.html" th:href="@{/page/runSpeedStati}">运行速度统计</a></li>
+                                        <li><a href="traffic-zhishu.html" th:href="@{/page/trafficNum}">交通指数</a></li>
+                                        <li><a href="traffic-routes.html" th:href="@{/page/congestionRoad}">拥堵路段</a></li>
+                                    </ul>
+                                </li>
+                                <li>
+                                    <span class="J_menuItem">换乘分析</span>
+                                    <ul>
+                                        <li><a href="transfer-form.html" th:href="@{/page/transChangeCons}">换乘量构成</a></li>
+                                        <li><a href="transfer-tongji.html" th:href="@{/page/transChangeStati}">换乘量统计</a></li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+                
+            </div>
+            <div class="map-area fr " id="content">
+                <div class="data-area clearfix passenger-number-area">
+                    <div class="fl pay-type data-type">
+                        <h3 class="chartsTitleHeight">支付类型统计</h3>
+                        <!--<div id="sheet-con01" class="sheet-content bg-fff" style="position: relative;">-->
+                        <div style="position: relative;">
+                            <div id="payTypeStatic" style="width: 100%;position: absolute;"></div>
+                        </div>
+                    </div>
+                    <div class="fr brush-card-type data-type">
+                        <h3 class="chartsTitleHeight">羊城通刷卡类型统计</h3>
+                        <div style="position: relative;">
+                            <div id="swingCardTypeStatic" style="width: 100%;position: absolute;"></div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</body>
+<script type="text/javascript" th:replace="common/fragment :: commonVar"></script>
+<script type="text/javascript" th:src="@{/static/jeasyui/jquery.easyui.min.js}"></script>
+<script type="text/javascript" th:src="@{/static/jeasyui/locale/easyui-lang-zh_CN.js}"></script>
+<script type="text/javascript" th:src="@{/static/js/echarts/echarts.min.js}"></script>
+<script type="text/javascript" th:src="@{/static/js/prototypeExpand.js}"></script>
+<script type="text/javascript" th:src="@{/static/js/ticcCommon.js}"></script>
+<script type="text/javascript">
+
+    //下面是页面的
+    $(function(){
+        var body = (document.compatMode && document.compatMode.toLowerCase() == "css1compat") ? document.documentElement : document.body;
+
+        function ResizeTable() {
+            var sideWidth = document.getElementById("side-menu");
+            var con = document.getElementById('content');
+//            var title01 = document.getElementById('data-title01');
+//            var title02 = document.getElementById('data-title02');
+            var payTypeStatic = document.getElementById('payTypeStatic');
+            var swingCardTypeStatic = document.getElementById('swingCardTypeStatic');
+            var chartsTitleHeight = document.getElementsByClassName('chartsTitleHeight')[0];
+
+            sideWidth.style.height = '' + Math.max((body.clientHeight - 100), 0) + "px";
+            con.style.height = '' + Math.max((body.clientHeight - 100), 0) + "px";
+            con.style.width = '' + Math.max((body.clientWidth - 180), 0) + "px";
+
+
+            payTypeStatic.style.height = '' + Math.max((con.clientHeight - chartsTitleHeight.clientHeight-50), 0) + "px";
+            swingCardTypeStatic.style.height = '' + Math.max((con.clientHeight - chartsTitleHeight.clientHeight-50), 0) + "px";
+//            chartsHeight.style.height = '' + Math.max((con.clientHeight - chartsTitleHeight.clientHeight-50), 0) + "px";
+        }
+        ResizeTable();
+
+        $(window).resize(function () {
+            ResizeTable()
+        });
+
+        var $item = $(".J_menuItem");
+        $item.on("click",function(){
+            var $this = $(this);
+            $this.siblings("ul").slideToggle(300);
+            $this.parent("li").siblings("li").find("ul").slideUp(300);
+            $this.parent("li").addClass("active").siblings("li").removeClass("active");
+        })
+
+
+
+
+    });
+
+
+    /*业务相关*/
+    $(function () {
+
+        /*###############################*/
+        /*公共的开始*/
+        var scale = 1;
+        var rich = {
+            paleGreen: {
+                color: "#13B1B1",
+                align: 'center',
+                fontSize: 12 * scale,
+                padding: [5, 0]
+            },
+            white: {
+                color: "#ffffff",
+                fontSize: 10 * scale,
+                padding: [2, 0],
+                align: 'left'
+            },
+            /*            hr: {
+                            borderColor: '#0b5263',
+                            width: '100%',
+                            borderWidth: 1,
+                            height: 0,
+                        }*/
+        };
+        /*公共的结束*/
+
+        /*###############################*/
+
+        /*支付类型统计图开始*/
+        var displayPayTypeStaticChart = function (data) {
+            // 基于准备好的dom，初始化echarts实例
+            var payTypeStaticChart = echarts.init(document.getElementById('payTypeStatic'));
+//            var echartData = [
+//                {value:25, name:'支付宝'},
+//                {value:20, name:'微信'},
+//                {value:15, name:'银联'},
+//                {value:10, name:'其他'},
+//                {value:35, name:'羊城通'}
+//            ];
+            var echartData = data;
+            // 指定图表的配置项和数据
+            var payTypeStaticChartOption = {
+//            title : {
+//                text: '南丁格尔玫瑰图',
+//                subtext: '纯属虚构',
+//                x:'center'
+//            },
+                tooltip : {
+                    trigger: 'item',
+                    formatter: "{a} <br/>{b} : {c} ({d}%)"
+                },
+                // legend: {
+                //     x : 'center',
+                //     y : 'bottom',
+                //     data:['支付宝','微信','银联','羊城通','其他']
+                // },
+                calculable : true,
+                series : [
+                    {
+                        name:'支付类型统计',
+                        type:'pie',
+                        radius : [0, 110],
+                        center : ['50%', '35%'],
+//                        roseType : 'area',
+//                        itemStyle: {
+//                            normal: {
+//                                color: function (obj) {
+//                                    var colors;
+//                                    switch (obj.dataIndex){
+//                                        case 0:
+//                                            colors = [
+//                                                {offset: 0, color: '#1BB5FB'},
+//                                                {offset: 1, color: '#ffffff'}
+//                                            ];
+//                                            break;
+//                                        case 1:
+//                                            colors = [
+//                                                {offset: 0, color: '#FFED3B'},
+//                                                {offset: 1, color: '#ffffff'}
+//                                            ];
+//                                            break;
+//                                        case 2:
+//                                            colors = [
+//                                                {offset: 0, color: '#158B4D'},
+//                                                {offset: 1, color: '#ffffff'}
+//                                            ];
+//                                            break;
+//                                        case 3:
+//                                            colors = [
+//                                                {offset: 0, color: '#FEAC4D'},
+//                                                {offset: 1, color: '#ffffff'}
+//                                            ];
+//                                            break;
+//                                        case 4:
+//                                            colors = [
+//                                                {offset: 0, color: '#FF2928'},
+//                                                {offset: 1, color: '#ffffff'}
+//                                            ];
+//                                            break;
+//                                        default:
+//                                            colors = [
+//                                                {offset: 0, color: '#1BB5FB'},
+//                                                {offset: 1, color: '#ffffff'}
+//                                            ];
+//                                            break;
+//                                    }
+//                                    return new echarts.graphic.LinearGradient(
+//                                        0, 0, 1, 0,colors
+//                                    );
+//                                }
+//                            }
+//                        },
+                        label: {
+                            normal: {
+                                height:50,
+                                width:85,
+                                margin:50,
+//                            formatter: "{b} : {c}万次 {d}%",
+//                             formatter: "{b} : {d}%",
+//                             formatter:  "{b} \n次数: {c}人次 \n所占百分比：{d}%",
+                                formatter: function(params, ticket, callback) {
+                                    var total = 0; //总数量
+                                    var percent = 0; //占比
+                                    echartData.forEach(function(value, index, array) {
+                                        total += parseInt(value.value);
+                                    });
+                                    percent = ((params.value / total) * 100).toFixed(1);
+                                    // return '{white|' + params.name + '}\n{hr|}\n{yellow|' + params.value + '}\n{blue|' + percent + '%}';
+                                    return '{paleGreen|' + params.name + '}\n{white|次数：' + params.value + '次}\n{white|所占百分比：' + percent + '%}';
+                                },
+                                // textStyle: {
+                                //     color: 'rgba(255, 255, 255, 1)'
+                                // },
+                                position: 'outer',
+                                backgroundColor:'rgba(0,0,0, 0.5)',
+                                // borderColor:'rgba(2,12,22, 0.3)',//rgba(255, 199, 43, .3)
+                                borderWidth:1,
+                                // shadowColor:'#020C16',
+                                borderRadius:10,
+                                // shadowBlur:30,
+                                textStyle:{
+                                    color:"#ffffff"
+                                },
+                                rich:rich,
+                                padding: [10, 10],
+                                // borderColor:'#ff0000',
+                                // borderWidth:'30'
+                            }
+                        },
+                        labelLine: {
+                             normal: {
+                                 show: true,
+                                 length:20,
+                             }
+                        },
+                        data:echartData,
+                    }
+                ]
+                // color:['#1BB5FB','#FFED3B','#158B4D','#FEAC4D','#FF2928']
+            };
+
+            // 使用刚指定的配置项和数据显示图表。
+            payTypeStaticChart.setOption(payTypeStaticChartOption);
+        };
+        /*支付类型统计图结束*/
+
+        /*###############################*/
+
+        /*羊城通刷卡类型统计图开始*/
+        var displaySwingCardTypeStatic = function (data) {
+            // 基于准备好的dom，初始化echarts实例
+            var swingCardTypeStaticChart = echarts.init(document.getElementById('swingCardTypeStatic'));
+            // 指定图表的配置项和数据
+            var echartData = data;
+            var swingCardTypeStaticChartOption = {
+//            title : {
+//                text: '南丁格尔玫瑰图',
+//                subtext: '纯属虚构',
+//                x:'center'
+//            },
+                tooltip : {
+                    trigger: 'item',
+                    formatter: "{a} <br/>{b} : {c} ({d}%)"
+                },
+                // legend: {
+                //     x : 'center',
+                //     y : 'bottom',
+                //     data:['支付宝','微信','银联','羊城通','其他']
+                // },
+                calculable : true,
+                series : [
+                    {
+                        name:'支付类型统计',
+                        type:'pie',
+                        radius : [0, 110],
+                        center : ['50%', '35%'],
+//                        roseType : 'area',
+//                        itemStyle: {
+//                            normal: {
+//                                color: function (obj) {
+//                                    var colors;
+//                                    switch (obj.dataIndex){
+//                                        case 0:
+//                                            colors = [
+//                                                {offset: 0, color: '#1BB5FB'},
+//                                                {offset: 1, color: '#ffffff'}
+//                                            ];
+//                                            break;
+//                                        case 1:
+//                                            colors = [
+//                                                {offset: 0, color: '#FFED3B'},
+//                                                {offset: 1, color: '#ffffff'}
+//                                            ];
+//                                            break;
+//                                        case 2:
+//                                            colors = [
+//                                                {offset: 0, color: '#158B4D'},
+//                                                {offset: 1, color: '#ffffff'}
+//                                            ];
+//                                            break;
+//                                        case 3:
+//                                            colors = [
+//                                                {offset: 0, color: '#FEAC4D'},
+//                                                {offset: 1, color: '#ffffff'}
+//                                            ];
+//                                            break;
+//                                        case 4:
+//                                            colors = [
+//                                                {offset: 0, color: '#FF2928'},
+//                                                {offset: 1, color: '#ffffff'}
+//                                            ];
+//                                            break;
+//                                        default:
+//                                            colors = [
+//                                                {offset: 0, color: '#1BB5FB'},
+//                                                {offset: 1, color: '#ffffff'}
+//                                            ];
+//                                            break;
+//                                    }
+//                                    return new echarts.graphic.LinearGradient(
+//                                        0, 0, 0, 1,colors
+//                                    );
+//                                }
+//                            }
+//                        },
+                        label: {
+                            normal: {
+                                height:50,
+                                width:85,
+//                            formatter: "{b} : {c}万次 {d}%",
+//                             formatter: "{b} : {d}%",
+//                             formatter:  "{b} \n次数: {c}人次 \n所占百分比：{d}%",
+                                formatter: function(params, ticket, callback) {
+                                    var total = 0; //总数量
+                                    var percent = 0; //占比
+                                    echartData.forEach(function(value, index, array) {
+                                        total += parseInt(value.value);
+                                    });
+                                    percent = ((params.value / total) * 100).toFixed(1);
+                                    // return '{white|' + params.name + '}\n{hr|}\n{yellow|' + params.value + '}\n{blue|' + percent + '%}';
+                                    return '{paleGreen|' + params.name + '}\n{white|次数：' + params.value + '次}\n{white|所占百分比：' + percent + '%}';
+                                },
+                                // textStyle: {
+                                //     color: 'rgba(255, 255, 255, 1)'
+                                // },
+                                position: 'outer',
+                                backgroundColor:'rgba(0,0,0, 0.5)',
+                                // borderColor:'rgba(2,12,22, 0.3)',//rgba(255, 199, 43, .3)
+                                borderWidth:1,
+                                // shadowColor:'#020C16',
+                                borderRadius:10,
+                                // shadowBlur:30,
+                                textStyle:{
+                                    color:"#ffffff"
+                                },
+                                rich:rich,
+                                padding: [10, 10],
+                                // borderColor:'#ff0000',
+                                // borderWidth:'30'
+                            }
+                        },
+                        labelLine: {
+                            normal: {
+                                show: true,
+                                length:20,
+                            }
+                        },
+                        data:echartData,
+
+                    }
+                ],
+//                 color:['#1BB5FB','#FFED3B','#158B4D','#FEAC4D','#FF2928','FF2928','']
+            };
+            // 使用刚指定的配置项和数据显示图表。
+            swingCardTypeStaticChart.setOption(swingCardTypeStaticChartOption);
+        };
+        /*羊城通刷卡类型统计图结束*/
+
+        /*###############################*/
+
+        /*请求支付数据开始*/
+        var requestPayData = function () {
+            var path = basePath+'/redis/getPassengerCapacity';
+            ticc.ajaxRequest(path,null,function (result) {
+                if (result.status){
+                    if (!ticc.isNullOrEmpty(result.data)){
+//                        alert(JSON.stringify(result.data));
+//                        alert(JSON.stringify(result.data.paytype));
+                        var payTypeStaticChartData = $.map(result.data.paytype,function (item,index) {
+                            return {value:item, name:index};
+                        });
+                        displayPayTypeStaticChart(payTypeStaticChartData);
+
+                        var swingCardTypeStaticChartData = $.map(result.data.cardtype,function (item,index) {
+                            return {value:item, name:index};
+                        });
+                        displaySwingCardTypeStatic(swingCardTypeStaticChartData);
+                    }else{
+//                        ticc.alertInfo(result.msg);
+                        console.log(JSON.stringify(result));
+                    }
+                }else{
+                    ticc.alertError(result.msg);
+                }
+            });
+        };
+
+        requestPayData();
+        /*请求支付数据结束*/
+
+        /*###############################*/
+
+        /*定时请求开始*/
+//        setInterval(function () {
+//            requestPayData();
+//        },10000);
+        /*定时请求结束*/
+    });
+
+
+</script>
+</html>

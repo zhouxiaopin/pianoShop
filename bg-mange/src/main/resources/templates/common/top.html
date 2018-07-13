@@ -1,0 +1,51 @@
+<div xmlns:th="http://www.thymeleaf.org" th:fragment="top">
+    <style type="text/css">
+        div.top{
+            width: 100%;
+            height: 100%;
+            background-color: #607377;
+            vertical-align: middle;
+            line-height: 66px;
+            /*padding: 10px;*/
+            padding-left: 10px;
+        }
+        div.top img{
+            width: 50px;
+            height: 50px;
+            /*display:inline-block;
+            vertical-align:middle;*/
+        }
+        div.top b{
+            margin-left: 8px;
+            font-size: 28px;
+            display:inline-block;
+            vertical-align:middle;
+            color: #FFFFFF;
+        }
+        div.top div.operateDiv{
+            float: right;
+            margin-right: 50px;
+        }
+        div.top div.operateDiv a{
+            text-decoration: none;
+            font-size: 14px;
+            color: #FFFFFF;
+        }
+    </style>
+    <div class="top" xmlns:th="http://www.thymeleaf.org">
+        <img th:src="@{/static/images/login/min_logo.png}">
+        <b>公交运行分析系统</b>
+        <div class="operateDiv">
+            <a id="logout" href="javascript:void(0)">退出</a>
+        </div>
+    </div>
+    <script type="text/javascript" th:replace="common/fragment :: commonVar" xmlns:th="http://www.thymeleaf.org"></script>
+    <script type="text/javascript">
+        $(function() {
+            $("#logout").on("click",function () {
+                window.location.href = basePath+"/admin/logout";
+            });
+        });
+    </script>
+
+</div>

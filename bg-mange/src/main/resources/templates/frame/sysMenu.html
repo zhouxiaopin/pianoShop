@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="common/commonHead :: common_header(~{::title},~{})">
+    <title>系统菜单</title>
+</head>
+<body>
+<div th:switch="${oprt}" style="width:100%;height: 100%;">
+    <div th:case="'query'" th:include="frame/sysMenuQuery :: sysMenuQuery" style="width:100%;height: 100%;">
+    </div>
+
+    <div th:case="*">
+        <form id="sysMenuForm" method="post">
+            <table style="margin: 0 auto;">
+                <tbody>
+                <td colspan="2">
+                    <label id="retMsg" style="display:block;text-align: center;color: #FF0000" th:inline="text">[[${retMsg}]]</label>
+                    <input name="sysMenuId" th:value="${obj.sysMenuId}" type="hidden"/>
+                </td>
+                <div th:switch="${oprt}">
+                    <div th:case="'add'">
+                        <tr>
+                            <th><label >菜单名称:</label></th>
+                            <td><input name="sysMenuName" th:value="${obj.sysMenuName}" class="easyui-textbox easyui-validatebox" missingMessage="菜单名字不能为空" data-options="required:true"/></td>
+                        </tr>
+                        <tr>
+                            <th><label >菜单url:</label></th>
+                            <td><input name="sysMenuUrl" th:value="${obj.sysMenuUrl}" class="easyui-textbox easyui-validatebox"/></td>
+                        </tr>
+                        <tr>
+                            <th><label >父级菜单:</label></th>
+                            <td><input name="parentNo" th:value="${obj.parentNo}" class="easyui-combobox easyui-validatebox" missingMessage="请选择父级菜单" data-options="required:true"/></td>
+                        </tr>
+                        <tr>
+                            <th><label >菜单级别:</label></th>
+                            <td>
+                                <select class="easyui-combobox" name="levelCode" style="width:170px;">
+                                    <option th:value="'00'" th:selected="${obj.levelCode == '00'}" >导航菜单</option>
+                                    <option th:value="'01'" th:selected="${obj.levelCode == '01'}" >一级菜单</option>
+                                    <option th:value="'02'" th:selected="${obj.levelCode == '02'}" >二级菜单</option>
+                                    <option th:value="'03'" th:selected="${obj.levelCode == '03'}" >三级菜单</option>
+                                    <option th:value="'04'" th:selected="${obj.levelCode == '04'}" >按钮</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th><label >菜单图标样式:</label></th>
+                            <td><input name="sysMenuIconCls" th:value="${obj.sysMenuIconCls}" class="easyui-textbox easyui-validatebox" type="text"/></td>
+                        </tr>
+                        <tr>
+                            <th><label >窗口打开方式:</label></th>
+                            <td>
+                                <select class="easyui-combobox" name="sysMenuOpenStyle" style="width:170px;">
+                                    <option th:value="'01'" th:selected="${obj.sysMenuOpenStyle == '01'}" >当前窗口</option>
+                                    <option th:value="'02'" th:selected="${obj.sysMenuOpenStyle == '02'}" >新窗口</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th><label >菜单执行的js:</label></th>
+                            <td>
+                                <select class="easyui-combobox" name="sysMenuExecuteJs" style="width:170px;">
+                                    <option th:value="''" th:selected="${obj.sysMenuExecuteJs == ''}" >请选择</option>
+                                    <option th:value="'01'" th:selected="${obj.sysMenuExecuteJs == '01'}" >仅仅选择一行</option>
+                                    <option th:value="'02'" th:selected="${obj.sysMenuExecuteJs == '02'}" >至少选择一行</option>
+                                </select>
+                            </td>
+                        </tr>
+                    </div>
+                    <div th:case="'update'">
+                        <tr>
+                            <th><label>菜单编号:</label></th>
+                            <td> <input name="sysMenuNo" missingMessage="菜单编号不能为空" th:value="${obj.sysMenuNo}" class="easyui-textbox easyui-validatebox" type="text" disabled /></td>
+                        </tr>
+                        <tr>
+                            <th><label >菜单名称:</label></th>
+                            <td><input name="sysMenuName" th:value="${obj.sysMenuName}" class="easyui-textbox easyui-validatebox" missingMessage="菜单名字不能为空" data-options="required:true"/></td>
+                        </tr>
+                        <tr>
+                            <th><label >菜单url:</label></th>
+                            <td><input name="sysMenuUrl" th:value="${obj.sysMenuUrl}" class="easyui-textbox easyui-validatebox"/></td>
+                        </tr>
+                        <tr>
+                            <th><label >父级菜单:</label></th>
+                            <td><input name="parentNo" th:value="${obj.parentNo}" class="easyui-combobox easyui-validatebox" missingMessage="请选择父级菜单" data-options="required:true"/></td>
+                        </tr>
+                        <tr>
+                            <th><label >菜单级别:</label></th>
+                            <td>
+                                <select class="easyui-combobox" name="levelCode" style="width:170px;">
+                                    <option th:value="'00'" th:selected="${obj.levelCode == '00'}" >导航菜单</option>
+                                    <option th:value="'01'" th:selected="${obj.levelCode == '01'}" >一级菜单</option>
+                                    <option th:value="'02'" th:selected="${obj.levelCode == '02'}" >二级菜单</option>
+                                    <option th:value="'03'" th:selected="${obj.levelCode == '03'}" >三级菜单</option>
+                                    <option th:value="'04'" th:selected="${obj.levelCode == '04'}" >按钮</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th><label >记录状态:</label></th>
+                            <td>
+                                <select name="useStatus" class="easyui-combobox" style="width:170px;">
+                                    <option th:value="'00'" th:selected="${obj.useStatus == '00'}" >禁用</option>
+                                    <option th:value="'01'" th:selected="${obj.useStatus == '01'}" >可用</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th><label >菜单图标样式:</label></th>
+                            <td><input name="sysMenuIconCls" th:value="${obj.sysMenuIconCls}" class="easyui-textbox easyui-validatebox" type="text"/></td>
+                        </tr>
+                        <tr>
+                            <th><label >窗口打开方式:</label></th>
+                            <td>
+                                <select class="easyui-combobox" name="sysMenuOpenStyle" style="width:170px;">
+                                    <option th:value="'01'" th:selected="${obj.sysMenuOpenStyle == '01'}" >当前窗口</option>
+                                    <option th:value="'02'" th:selected="${obj.sysMenuOpenStyle == '02'}" >新窗口</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th><label >菜单执行的js:</label></th>
+                            <td>
+                                <select class="easyui-combobox" name="sysMenuExecuteJs" style="width:170px;">
+                                    <option th:value="''" th:selected="${obj.sysMenuExecuteJs == ''}" >请选择</option>
+                                    <option th:value="'01'" th:selected="${obj.sysMenuExecuteJs == '01'}" >仅仅选择一行</option>
+                                    <option th:value="'02'" th:selected="${obj.sysMenuExecuteJs == '02'}" >至少选择一行</option>
+                                </select>
+                            </td>
+                        </tr>
+                    </div>
+                    <div th:case="'queryDetail'">
+                        <tr>
+                            <th><label>菜单编号:</label></th>
+                            <td> <input name="sysMenuNo" missingMessage="菜单编号不能为空" th:value="${obj.sysMenuNo}" class="easyui-textbox easyui-validatebox" type="text" data-options="required:true" /></td>
+                        </tr>
+                        <tr>
+                            <th><label >菜单名称:</label></th>
+                            <td><input name="sysMenuName" th:value="${obj.sysMenuName}" class="easyui-textbox easyui-validatebox" type="text"/></td>
+                        </tr>
+                        <tr>
+                            <th><label >菜单url:</label></th>
+                            <td><input name="sysMenuUrl" th:value="${obj.sysMenuUrl}" class="easyui-textbox easyui-validatebox" type="text"/></td>
+                        </tr>
+                        <tr>
+                            <th><label >父级菜单:</label></th>
+                            <td><input name="parentNo" th:value="${obj.parentNo}" class="easyui-combobox easyui-validatebox" type="text" disabled="disabled"/></td>
+                        </tr>
+                        <tr>
+                            <th><label >菜单级别:</label></th>
+                            <td>
+                                <select class="easyui-combobox" name="levelCode" style="width:170px;">
+                                    <option th:value="'00'" th:selected="${obj.levelCode == '00'}" >导航菜单</option>
+                                    <option th:value="'01'" th:selected="${obj.levelCode == '01'}" >一级菜单</option>
+                                    <option th:value="'02'" th:selected="${obj.levelCode == '02'}" >二级菜单</option>
+                                    <option th:value="'03'" th:selected="${obj.levelCode == '03'}" >三级菜单</option>
+                                    <option th:value="'04'" th:selected="${obj.levelCode == '04'}" >按钮</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th><label >记录状态:</label></th>
+                            <td>
+                                <select name="useStatus" class="easyui-combobox" style="width:170px;">
+                                    <option th:value="'00'" th:selected="${obj.useStatus == '00'}" >禁用</option>
+                                    <option th:value="'01'" th:selected="${obj.useStatus == '01'}" >可用</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th><label >创建时间:</label></th>
+                            <td><input name="createTime" th:value="${#dates.format(obj.createTime, 'yyyy-MM-dd HH:mm:ss')}" class="easyui-datetimebox" type="text"/></td>
+                        </tr>
+                        <tr>
+                            <th><label >菜单图标样式:</label></th>
+                            <td><input name="sysMenuIconCls" th:value="${obj.sysMenuIconCls}" class="easyui-textbox easyui-validatebox" type="text"/></td>
+                        </tr>
+                        <tr>
+                            <th><label >窗口打开方式:</label></th>
+                            <td>
+                                <select class="easyui-combobox" name="sysMenuOpenStyle" style="width:170px;">
+                                    <option th:value="'01'" th:selected="${obj.sysMenuOpenStyle == '01'}" >当前窗口</option>
+                                    <option th:value="'02'" th:selected="${obj.sysMenuOpenStyle == '02'}" >新窗口</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th><label >菜单执行的js:</label></th>
+                            <td>
+                                <select class="easyui-combobox" name="sysMenuExecuteJs" style="width:170px;">
+                                    <option th:value="''" th:selected="${obj.sysMenuExecuteJs == ''}" >请选择</option>
+                                    <option th:value="'01'" th:selected="${obj.sysMenuExecuteJs == '01'}" >仅仅选择一行</option>
+                                    <option th:value="'02'" th:selected="${obj.sysMenuExecuteJs == '02'}" >至少选择一行</option>
+                                </select>
+                            </td>
+                        </tr>
+                    </div>
+                </div>
+                    <tr>
+                        <td colspan="2" style="text-align: center;padding-top: 5px">
+                            <a id="submitForm" class="easyui-linkbutton" data-options="iconCls:'icon-ok'">确定</a>
+                            <a id="resetForm" class="easyui-linkbutton" data-options="iconCls:'icon-undo'">重置</a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </form>
+        <script type="text/javascript" th:replace="common/fragment :: commonVar"></script>
+        <script type="text/javascript" th:inline="javascript">
+            $(function () {
+
+                var oprt = [[${oprt }]];
+                $('input[name=parentNo]').combobox({
+                    valueField: 'id',
+                    textField: 'text',
+                    url: basePath+'/sysMenu/getComboBox'
+                });
+
+                if(oprt == "queryDetail"){
+                    $("#sysMenuForm").find(":input").attr("disabled",true);
+                    $("#sysMenuForm").find("a").attr("disabled",true);
+                }
+
+                $('#sysMenuForm').form({
+                    url:basePath+'/sysMenu/'+oprt,
+                    onSubmit: function(param){
+                        var isValid = $(this).form('validate');
+                        if (!isValid){
+                            $('#retMsg').html("表单校验不通过");
+                        }
+                        return isValid;	// 返回false终止表单提交
+                    },
+                    success:function(data){
+                        data = JSON.parse(data);
+                        $('#retMsg').html(data.msg);
+                    }
+                });
+                $('#submitForm').on('click',function () {
+                    if ($(this).linkbutton('options').disabled == false) {
+                        $('#sysMenuForm').form('submit');
+                    }
+                });
+                $('#resetForm').on('click',function () {
+                    if ($(this).linkbutton('options').disabled == false) {
+                        $('#sysMenuForm').form('reset');
+                    }
+                });
+
+            });
+
+        </script>
+    </div>
+</div>
+
+</body>
+</html>

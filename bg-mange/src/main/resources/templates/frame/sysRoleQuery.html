@@ -1,0 +1,71 @@
+<div xmlns:th="http://www.thymeleaf.org" th:fragment="sysRoleQuery" xmlns:ticc="">
+    <script type="text/javascript" th:replace="common/fragment :: commonVar"></script>
+
+    <ticc:datagrid controRequestPath="/sysRole" idField="roleId" commonQueryDivId="sysRole" singleSelect="true"
+                   buttonParentNo="10-13"
+                   searchParams="{
+                'sysRoleCustom.roleNo': $('#sysRole').find('#roleNo').val(),
+                'sysRoleCustom.roleName': $('#sysRole').find('#roleName').val()
+                }"
+                   columns="[[
+            {field:'roleId',title:'id',checkbox:true,width:ticc.getFixWidth(0.1)},
+            {field:'roleNo',title:'角色编号',width:ticc.getFixWidth(0.15)},
+            {field:'roleName',title:'角色名',width:ticc.getFixWidth(0.2)},
+            {field:'remark',title:'备注',width:ticc.getFixWidth(0.25)},
+            {field:'useStatus',title:'记录状态',width:ticc.getFixWidth(0.15),
+                formatter: function(value){
+                                    if (value){
+                                        var temp;
+                                        switch (value){
+                                            case '00':
+                                                temp = '禁用';
+                                                break;
+                                            case '01':
+                                                temp = '可用';
+                                                break;
+                                            default:
+                                                break;
+                                        }
+                                        return temp;
+                                    }else{
+                                        return value;
+                                    }
+                                }
+            },
+            {field:'createTime',title:'创建时间',width:ticc.getFixWidth(0.15),
+                formatter: function(value){
+                    if (value){
+                        var date = new Date(value).format('yyyy-MM-dd hh:mm:ss');
+                        return date;
+                    }else{
+                        return value;
+                    }
+
+                }
+            }
+        ]]"
+                   toolbar="[{
+                        iconCls: 'icon-edit',
+                        text: '设置权限',
+                        handler: function(){
+                            if (datagridCheckOne()){
+                                return;
+                            }
+                            $('.dialog').dialog({
+                                title: '设置权限',
+                                href: '${pageContext.request.contextPath}/sysRole/initSetAuthority.action',
+                                queryParams: {'id':datagridGetSelectedRow['roleId']},
+                                onClose:function () {
+                                    datagridReload();
+                                }
+                            });
+                        }
+        }]" searchArea="
+        &lt;legend class='legend'&gt;信息查询&lt;/legend&gt;
+    角色编号:&nbsp;&lt;input id='roleNo' class='easyui-textbox' /&gt;&nbsp;
+    角色名:&nbsp;&lt;input id='roleName' class='easyui-textbox' /&gt;&nbsp;
+">
+
+    </ticc:datagrid>
+
+</div>

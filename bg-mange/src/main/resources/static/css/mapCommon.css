@@ -1,0 +1,96 @@
+/*信息窗体开始*/
+section.infoBox{
+    /*      position: absolute;
+          top: 200px;*/
+    padding-top: 20px;
+    position: relative;
+    left: -80px;
+    width: 200px;
+    height: 300px;
+    background: url("../images/map/info_box_bg.png") no-repeat;
+    background-size: 100% 100%;
+    z-index: 1201;
+}
+section.infoBox>img{
+    position: absolute;
+    width: 15px;
+    height: 15px;
+    left:170px;
+    top: 50px;
+}
+section.infoBox header{
+    text-align: center;
+    margin-top: 50px;
+}
+section.infoBox article{
+    color: #5BC8DD;
+    margin-left: 20px;
+    margin-top: 5px;
+}
+section.infoBox article span{
+    font-size: 14px;
+}
+/*隐藏自带的关闭按钮*/
+div.infoBox>img{
+    display: none;
+}
+/*信息窗体结束*/
+
+/*
+.header {
+    position: absolute;
+    top: 0px;
+    margin: auto;
+    left: 50%;
+    -webkit-transform: translate(-50%,0);!* Safari 和 Chrome *!
+    -ms-transform: translate(-50%,0);!* IE 9 *!
+    -moz-transform: translate(-50%,0);!* Firefox *!
+    -o-transform: translate(-50%,0);!* Opera *!
+    transform: translate(-50%,0);
+    width: 600px;
+    height: 60px;
+    color: #FFFFFF;
+    font-size: 30px;
+    text-align: center;
+    vertical-align: middle;
+    line-height: 60px;
+    z-index: 1201;
+    padding-right: 100px;
+    padding-left: 100px;
+    background: url("../images/title_bg.png") no-repeat;
+    -moz-background-size:100% 100%; !* 老版本的 Firefox *!
+    background-size:100% 100%;
+}
+.title{
+    width: 100%;
+    height: 100%;
+}
+.zhixian{
+    position: absolute;
+    bottom: 0px;
+    width: 600px;
+    height: 2px;
+    border:2px solid #FFFFFF;
+    background-color: #FFFFFF;
+    border-radius: 5px;
+}
+.menuList{
+    display: none;
+}
+.menuList {
+    font-size: 22px;
+}
+.menuList input:checked + label:nth-of-type(n+1){
+    color: #FFFFFF;
+    background: url("../images/tab_indicator.png") no-repeat  center bottom;
+    -moz-background-size:20px 10px; !* 老版本的 Firefox *!
+    background-size:20px 10px;
+    padding-bottom: 15px;
+}
+.menuList input[type="radio"]{
+    display: none;
+}
+.menuList input[type="radio"] ~ label{
+    color: #5DCDE3;
+    cursor: pointer;
+}*/
